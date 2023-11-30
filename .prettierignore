@@ -1,7 +1,0 @@
-node_modules
-build
-dist
-.husky
-.DS_Store
-pnpm-lock.yaml
-pnpm-workspace.yaml
