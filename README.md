@@ -1,0 +1,12 @@
+# Tech stack
+- vue3
+- vite
+- ts
+- unocss
+- eslint
+- prettier
+- unplugin
+- husky
+- lint-stage
+- commitizen
+- commitlint
