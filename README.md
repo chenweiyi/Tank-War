@@ -11,7 +11,8 @@ One day My son ask me whether I could make a game for him. I said yes, so I deci
 ## Timeline
 
 - 2023-11-28: I hava a basic idea.
-- 2017-11-30: Init project.
+- 2023-11-30: Init project.
+- 2023-12-03: canvas building; add two players; move and shot keyboard binding; simple collision handling
 
 ## Road Map
 
