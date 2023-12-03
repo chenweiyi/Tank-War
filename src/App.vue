@@ -1,9 +1,7 @@
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <div>Hello world</div>
+  <GameCanvas></GameCanvas>
 </template>
 
 <style scoped></style>
