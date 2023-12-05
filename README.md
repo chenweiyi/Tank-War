@@ -13,6 +13,7 @@ One day My son ask me whether I could make a game for him. I said yes, so I deci
 - 2023-11-28: I hava a basic idea.
 - 2023-11-30: Init project.
 - 2023-12-03: canvas building; add two players; move and shot keyboard binding; simple collision handling
+- 2023-12-05: add enemy tank
 
 ## Road Map
 
