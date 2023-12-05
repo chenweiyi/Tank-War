@@ -1,25 +1,43 @@
-import { IDirection, IKeyBindMove, INode, IPlayerDirectionProperty, IPlayerType } from '../game'
+import { IDirection, IKeyBindMove, INode, ITankDirectionProperty, ITankType } from '../game'
 import Bullet from './Bullet'
 import Stage from './Stage'
-import { isCollision } from './utils'
+import { isBrick, isBullet, isCollision, isTank } from './utils'
 
 export default class Tank {
-  type: IPlayerType
+  type: ITankType
   x: number
   y: number
   direction: IDirection
   speed: number = 4
-  directionProperty: IPlayerDirectionProperty | undefined
+  directionProperty: ITankDirectionProperty | undefined
   keybindMoveConfig: IKeyBindMove | undefined
   stage: InstanceType<typeof Stage> | undefined
   scale = 1.2
 
-  constructor(type: IPlayerType, x: number, y: number, direction: IDirection) {
+  constructor({
+    type,
+    x,
+    y,
+    speed,
+    direction,
+    scale = 1.2,
+  }: {
+    type: ITankType
+    x: number
+    y: number
+    speed: number
+    direction: IDirection
+    scale?: number
+  }) {
     this.type = type
     this.x = x
     this.y = y
+    this.speed = speed
+    this.scale = scale
     this.direction = direction
   }
+
+  init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {}
 
   addStage(stage: InstanceType<typeof Stage>) {
     this.stage = stage
@@ -52,10 +70,19 @@ export default class Tank {
   gotCollision(node: INode) {
     if (node.type === 'bullet') {
       this.destroy()
-    } else if (node.type === 'brick' || node.type === 'player1' || node.type === 'player2') {
-      // do nothing
     }
   }
+
+  /**
+   * collision other node
+   * @param {INode} node - collision node
+   */
+  collisionOther(node: INode) {}
+
+  /**
+   * collision stage
+   */
+  collisionStage() {}
 
   draw(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
     if (this.directionProperty) {
@@ -81,93 +108,101 @@ export default class Tank {
     }
   }
 
+  moveUp() {
+    this.direction = 'up'
+    this.y -= this.speed
+    const collision = isCollision(this, this.stage!.elements)
+    if (collision) {
+      if (isBrick(collision) || isTank(collision)) {
+        // if collision restore y
+        this.y += this.speed
+        this.collisionOther(collision)
+      } else if (isBullet(collision)) {
+        this.destroy()
+        return
+      }
+    }
+    if (this.getTop() < 0) {
+      this.y = 0
+      this.collisionStage()
+    }
+  }
+
+  moveDown() {
+    this.direction = 'down'
+    this.y += this.speed
+    const collision = isCollision(this, this.stage!.elements)
+    if (collision) {
+      if (isBrick(collision) || isTank(collision)) {
+        // if collision restore y
+        this.y -= this.speed
+        this.collisionOther(collision)
+      } else if (isBullet(collision)) {
+        this.destroy()
+        return
+      }
+    }
+    if (this.getBottom() > this.stage!.h) {
+      this.y = this.stage!.h - this.directionProperty!.down![3] * this.scale
+      this.collisionStage()
+    }
+  }
+
+  moveLeft() {
+    this.direction = 'left'
+    this.x -= this.speed
+    const collision = isCollision(this, this.stage!.elements)
+    if (collision) {
+      if (isBrick(collision) || isTank(collision)) {
+        // if collision restore x
+        this.x += this.speed
+        this.collisionOther(collision)
+      } else if (isBullet(collision)) {
+        this.destroy()
+        return
+      }
+    }
+
+    if (this.getLeft() < 0) {
+      this.x = 0
+      this.collisionStage()
+    }
+  }
+
+  moveRight() {
+    this.direction = 'right'
+    this.x += this.speed
+    const collision = isCollision(this, this.stage!.elements)
+    if (collision) {
+      if (isBrick(collision) || isTank(collision)) {
+        // if collision restore x
+        this.x -= this.speed
+        this.collisionOther(collision)
+      } else if (isBullet(collision)) {
+        this.destroy()
+        return
+      }
+    }
+
+    if (this.getRight() > this.stage!.w) {
+      this.x = this.stage!.w - this.directionProperty!.right![2] * this.scale
+      this.collisionStage()
+    }
+  }
+
   moveHandler(e: KeyboardEvent) {
-    // console.log('key:', e.key)
-    let collision: INode | false
     switch (e.key) {
       case this.keybindMoveConfig!['up']:
-        this.direction = 'up'
-        this.y -= this.speed
-        collision = isCollision(this, this.stage!.elements)
-        if (collision) {
-          if (
-            collision.type === 'brick' ||
-            collision.type === 'player1' ||
-            collision.type === 'player2'
-          ) {
-            // if collision restore y
-            this.y += this.speed
-          } else if (collision.type === 'bullet') {
-            this.destroy()
-            return
-          }
-        }
-
-        if (this.getTop() < 0) this.y = 0
+        this.moveUp()
         break
       case this.keybindMoveConfig!['down']:
-        this.direction = 'down'
-        this.y += this.speed
-        collision = isCollision(this, this.stage!.elements)
-        if (collision) {
-          if (
-            collision.type === 'brick' ||
-            collision.type === 'player1' ||
-            collision.type === 'player2'
-          ) {
-            // if collision restore y
-            this.y -= this.speed
-          } else if (collision.type === 'bullet') {
-            this.destroy()
-            return
-          }
-        }
-        if (this.getBottom() > this.stage!.h) {
-          this.y = this.stage!.h - this.directionProperty!.down![3] * this.scale
-        }
-
+        this.moveDown()
         break
       case this.keybindMoveConfig!['left']:
-        this.direction = 'left'
-        this.x -= this.speed
-        collision = isCollision(this, this.stage!.elements)
-        if (collision) {
-          if (
-            collision.type === 'brick' ||
-            collision.type === 'player1' ||
-            collision.type === 'player2'
-          ) {
-            // if collision restore x
-            this.x += this.speed
-          } else if (collision.type === 'bullet') {
-            this.destroy()
-            return
-          }
-        }
-
-        if (this.getLeft() < 0) this.x = 0
+        this.moveLeft()
         break
       case this.keybindMoveConfig!['right']:
-        this.direction = 'right'
-        this.x += this.speed
-        collision = isCollision(this, this.stage!.elements)
-        if (collision) {
-          if (
-            collision.type === 'brick' ||
-            collision.type === 'player1' ||
-            collision.type === 'player2'
-          ) {
-            // if collision restore x
-            this.x -= this.speed
-          } else if (collision.type === 'bullet') {
-            this.destroy()
-            return
-          }
-        }
-
-        if (this.getRight() > this.stage!.w) {
-          this.x = this.stage!.w - this.directionProperty!.right![2] * this.scale
-        }
+        this.moveRight()
         break
     }
   }

@@ -27,3 +27,34 @@ export const isCollision = (node: INode, elements: INode[]) => {
   }
   return false
 }
+
+export const isTank = (node: INode) => {
+  return (
+    node.type === 'player1' ||
+    node.type === 'player2' ||
+    node.type === 'red' ||
+    node.type === 'midRed' ||
+    node.type === 'bigRed' ||
+    node.type === 'sliver' ||
+    node.type === 'midSliver' ||
+    node.type === 'bigSliver' ||
+    node.type === 'brown' ||
+    node.type === 'midBrown' ||
+    node.type === 'bigBrown'
+  )
+}
+
+export const isBrick = (node: INode) => {
+  return node.type === 'brick'
+}
+
+/**
+ * 是否是道具
+ */
+export const isProp = (node: INode) => {
+  return node.type === 'prop'
+}
+
+export const isBullet = (node: INode) => {
+  return node.type === 'bullet'
+}

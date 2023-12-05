@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import graghics from '../assets/images/graphics.png'
+import Enemy from '../game/Enemy'
 import Player1 from '../game/Player1'
 import Player2 from '../game/Player2'
 import Stage from '../game/Stage.ts'
@@ -15,10 +16,12 @@ onMounted(() => {
     const canvas = canvasRef.value as HTMLCanvasElement
     const ctx = canvas!.getContext('2d')
     const stage = new Stage(img, ctx!, w.value, h.value)
-    const player1 = new Player1(60, 60)
-    const player2 = new Player2(0, 0)
+    const player1 = new Player1({ x: 300, y: 500, direction: 'up' })
+    const player2 = new Player2({ x: 500, y: 500, direction: 'up' })
+    const enemy1 = new Enemy({ x: 0, y: 0, direction: 'down' })
     stage.add(player1)
     stage.add(player2)
+    stage.add(enemy1)
     stage.start()
   }
 })

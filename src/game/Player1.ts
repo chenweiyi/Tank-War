@@ -1,10 +1,8 @@
-import { IDirection, IKeyBindMove, IPlayerDirectionProperty } from '../game'
+import { IDirection, IKeyBindMove, ITankDirectionProperty } from '../game'
 import Tank from './Tank'
 
 export default class Player1 extends Tank {
-  speed: number = 4
-  direction: IDirection = 'down'
-  directionProperty: IPlayerDirectionProperty = {
+  directionProperty: ITankDirectionProperty = {
     up: [771, 3, 26, 26],
     down: [835, 3, 26, 26],
     left: [867, 3, 26, 26],
@@ -17,8 +15,18 @@ export default class Player1 extends Tank {
     right: 'ArrowRight',
     shot: ' ',
   }
-  constructor(x: number, y: number, direction: IDirection = 'down') {
-    super('player1', x, y, direction)
+  constructor({
+    x,
+    y,
+    speed = 6,
+    direction = 'down',
+  }: {
+    x: number
+    y: number
+    speed?: number
+    direction?: IDirection
+  }) {
+    super({ type: 'player1', x, y, speed, direction })
     this.bindEvents()
   }
 }
