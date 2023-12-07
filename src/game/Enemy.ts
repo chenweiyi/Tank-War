@@ -5,8 +5,9 @@ import {
   INode,
   ITankDirectionProperty,
 } from '../game'
+import Bullet from './Bullet'
 import Tank from './Tank'
-import { isBrick, isBullet, isTank } from './utils'
+import { isBrick, isBullet, isTank, randomNumber } from './utils'
 
 function getRandomDirection() {
   const directions: IDirection[] = ['up', 'down', 'left', 'right']
@@ -18,19 +19,19 @@ function getHumanizedRandomDirection(currentDirection: IDirection) {
   let directions: IDirection[]
   switch (currentDirection) {
     case 'up':
-      directions = ['left', 'up', 'right']
+      directions = ['left', 'right']
       res = directions[Math.floor(Math.random() * directions.length)]
       break
     case 'down':
-      directions = ['left', 'down', 'right']
+      directions = ['left', 'right']
       res = directions[Math.floor(Math.random() * directions.length)]
       break
     case 'left':
-      directions = ['up', 'left', 'down']
+      directions = ['up', 'down']
       res = directions[Math.floor(Math.random() * directions.length)]
       break
     case 'right':
-      directions = ['up', 'right', 'down']
+      directions = ['up', 'down']
       res = directions[Math.floor(Math.random() * directions.length)]
       break
   }
@@ -111,8 +112,10 @@ export default class Enemy extends Tank {
   direction: IDirection
   #rqAF: number | undefined
   #timer: number | undefined
-  #collisionInterval: number = 1000
+  #collisionInterval: number = 500
   #stopMove: boolean = false
+  #shotInterval = 3000
+  #shotTimer: NodeJS.Timeout | undefined = undefined
 
   constructor({
     enemyType,
@@ -120,18 +123,20 @@ export default class Enemy extends Tank {
     y,
     speed = 2,
     direction,
+    bulletColor = '#fff',
   }: {
     enemyType?: IEnemyTankType
     x: number
     y: number
     speed?: number
     direction?: IDirection
+    bulletColor?: string
   }) {
     const enemyDirection = getRandomDirection()
     const enemyTankType = getRandomEnemyTankType()
     const type = enemyType || enemyTankType
     const direction0 = direction || enemyDirection
-    super({ type, x, y, speed, direction: direction0 })
+    super({ type, x, y, speed, direction: direction0, bulletColor })
     this.directionProperty = this.#enemyDirectionProperty[type]
     this.direction = direction0
     this.bindEvents()
@@ -139,6 +144,29 @@ export default class Enemy extends Tank {
 
   init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
     this.#moveByDirection()
+    this.#autoShot()
+    this.#randomMove()
+  }
+
+  #wait(time: number) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(1)
+      }, time)
+    })
+  }
+
+  async #randomMove() {
+    await this.#wait(randomNumber(2000, 6000))
+    this.#thinkNext()
+    this.#randomMove()
+  }
+
+  #autoShot() {
+    this.#shotTimer = setInterval(() => {
+      const bullet = new Bullet(this.bulletColor, 6, this)
+      this.stage!.add(bullet)
+    }, this.#shotInterval)
   }
 
   #moveByDirection() {
@@ -167,7 +195,7 @@ export default class Enemy extends Tank {
   collisionOther(node: INode) {
     if (isBrick(node) || isTank(node)) {
       this.#thinkNext()
-    } else if (isBullet(node)) {
+    } else if (isBullet(node) && node.source !== this) {
       this.destroy()
     }
   }
@@ -196,4 +224,11 @@ export default class Enemy extends Tank {
   bindEvents(): void {}
 
   unbindEvents(): void {}
+
+  destroy() {
+    this.#rqAF !== undefined && cancelAnimationFrame(this.#rqAF)
+    this.#timer !== undefined && clearTimeout(this.#timer)
+    this.#shotTimer !== undefined && clearInterval(this.#shotTimer)
+    this.stage!.destroy(this)
+  }
 }

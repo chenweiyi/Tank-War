@@ -58,3 +58,10 @@ export const isProp = (node: INode) => {
 export const isBullet = (node: INode) => {
   return node.type === 'bullet'
 }
+
+/**
+ * 在给定的开始和结束数字之间随机生成一个数字
+ */
+export const randomNumber = (start: number, end: number) => {
+  return start + Math.floor(Math.random() * (end - start))
+}

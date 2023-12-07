@@ -20,13 +20,15 @@ export default class Player1 extends Tank {
     y,
     speed = 6,
     direction = 'down',
+    bulletColor = 'rgb(83,197,128)',
   }: {
     x: number
     y: number
     speed?: number
     direction?: IDirection
+    bulletColor?: string
   }) {
-    super({ type: 'player1', x, y, speed, direction })
+    super({ type: 'player1', x, y, speed, direction, bulletColor })
     this.bindEvents()
   }
 }

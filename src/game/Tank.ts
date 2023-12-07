@@ -13,6 +13,7 @@ export default class Tank {
   keybindMoveConfig: IKeyBindMove | undefined
   stage: InstanceType<typeof Stage> | undefined
   scale = 1.2
+  bulletColor = '#fff'
 
   constructor({
     type,
@@ -21,6 +22,7 @@ export default class Tank {
     speed,
     direction,
     scale = 1.2,
+    bulletColor = '#fff',
   }: {
     type: ITankType
     x: number
@@ -28,6 +30,7 @@ export default class Tank {
     speed: number
     direction: IDirection
     scale?: number
+    bulletColor?: string
   }) {
     this.type = type
     this.x = x
@@ -35,6 +38,7 @@ export default class Tank {
     this.speed = speed
     this.scale = scale
     this.direction = direction
+    this.bulletColor = bulletColor
   }
 
   init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {}
@@ -69,7 +73,9 @@ export default class Tank {
    */
   gotCollision(node: INode) {
     if (node.type === 'bullet') {
-      this.destroy()
+      if (node.source !== this) {
+        this.destroy()
+      }
     }
   }
 
@@ -117,7 +123,7 @@ export default class Tank {
         // if collision restore y
         this.y += this.speed
         this.collisionOther(collision)
-      } else if (isBullet(collision)) {
+      } else if (isBullet(collision) && collision.source !== this) {
         this.destroy()
         return
       }
@@ -137,7 +143,7 @@ export default class Tank {
         // if collision restore y
         this.y -= this.speed
         this.collisionOther(collision)
-      } else if (isBullet(collision)) {
+      } else if (isBullet(collision) && collision.source !== this) {
         this.destroy()
         return
       }
@@ -157,7 +163,7 @@ export default class Tank {
         // if collision restore x
         this.x += this.speed
         this.collisionOther(collision)
-      } else if (isBullet(collision)) {
+      } else if (isBullet(collision) && collision.source !== this) {
         this.destroy()
         return
       }
@@ -178,7 +184,7 @@ export default class Tank {
         // if collision restore x
         this.x -= this.speed
         this.collisionOther(collision)
-      } else if (isBullet(collision)) {
+      } else if (isBullet(collision) && collision.source !== this) {
         this.destroy()
         return
       }
@@ -219,7 +225,7 @@ export default class Tank {
     // console.log('key:', e.key)
     switch (e.key) {
       case this.keybindMoveConfig!['shot']: {
-        const bullet = new Bullet(this.type === 'player1' ? '#fff' : 'rgb(230,162,60)', 6, this)
+        const bullet = new Bullet(this.bulletColor, 6, this)
         this.stage!.add(bullet)
         break
       }

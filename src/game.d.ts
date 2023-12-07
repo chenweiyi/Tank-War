@@ -13,6 +13,7 @@ export interface INode {
   getRight: () => number
   getBottom: () => number
   gotCollision: (node: INode) => void // was collisioned
+  source?: INode
 }
 
 // tank

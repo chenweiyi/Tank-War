@@ -1,4 +1,4 @@
-import { IDirection, IType } from '../game'
+import { IDirection, INode, IType } from '../game'
 import Stage from './Stage'
 import Tank from './Tank'
 import { isCollision } from './utils'
@@ -47,10 +47,12 @@ export default class Bullet {
   y: number
   direction: IDirection
   stage: InstanceType<typeof Stage> | undefined
+  source: InstanceType<typeof Tank>
 
   constructor(color: string, speed: number, source: InstanceType<typeof Tank>) {
     this.color = color
     this.speed = speed
+    this.source = source
     const { direction, x, y } = getShotBulletInitInfo(source)
     this.direction = direction
     this.x = x
@@ -73,8 +75,10 @@ export default class Bullet {
     return this.y + this.r
   }
 
-  gotCollision() {
-    this.destroy()
+  gotCollision(node: INode) {
+    if (node !== this.source) {
+      this.destroy()
+    }
   }
 
   init(ctx: CanvasRenderingContext2D) {
@@ -110,12 +114,15 @@ export default class Bullet {
         this.x += this.speed
         break
     }
+    let ele: INode | false
     if (this.y < 0 || this.y > this.stage!.h || this.x < 0 || this.x > this.stage!.w) {
       // out of stage
       this.destroy()
-    } else if (isCollision(this, this.stage!.elements)) {
-      // collision
-      this.destroy()
+    } else if ((ele = isCollision(this, this.stage!.elements))) {
+      if (ele !== this.source) {
+        // collision
+        this.destroy()
+      }
     } else {
       this.#draw(ctx)
     }
