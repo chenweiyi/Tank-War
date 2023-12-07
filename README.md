@@ -14,6 +14,7 @@ One day My son ask me whether I could make a game for him. I said yes, so I deci
 - 2023-11-30: Init project.
 - 2023-12-03: canvas building; add two players; move and shot keyboard binding; simple collision handling
 - 2023-12-05: add enemy tank
+- 2023-12-07: add enemy tank shoot bullet; add enemy tank IQ; when element destroy stop render interval handler
 
 ## Road Map
 
