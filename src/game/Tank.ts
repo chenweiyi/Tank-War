@@ -14,6 +14,7 @@ export default class Tank {
   stage: InstanceType<typeof Stage> | undefined
   scale = 1.2
   bulletColor = '#fff'
+  _destroy = false
 
   constructor({
     type,

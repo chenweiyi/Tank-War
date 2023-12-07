@@ -48,6 +48,7 @@ export default class Bullet {
   direction: IDirection
   stage: InstanceType<typeof Stage> | undefined
   source: InstanceType<typeof Tank>
+  _destroy = false
 
   constructor(color: string, speed: number, source: InstanceType<typeof Tank>) {
     this.color = color

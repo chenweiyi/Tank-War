@@ -14,6 +14,7 @@ export interface INode {
   getBottom: () => number
   gotCollision: (node: INode) => void // was collisioned
   source?: INode
+  _destroy: boolean
 }
 
 // tank

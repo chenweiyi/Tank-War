@@ -44,6 +44,7 @@ export default class Stage {
   }
 
   destroy(node: INode) {
+    node._destroy = true
     this.elements = this.elements.filter((element) => element !== node)
   }
 }

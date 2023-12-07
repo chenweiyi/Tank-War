@@ -158,15 +158,17 @@ export default class Enemy extends Tank {
 
   async #randomMove() {
     await this.#wait(randomNumber(2000, 6000))
+    if (this._destroy) return
     this.#thinkNext()
     this.#randomMove()
   }
 
-  #autoShot() {
-    this.#shotTimer = setInterval(() => {
-      const bullet = new Bullet(this.bulletColor, 6, this)
-      this.stage!.add(bullet)
-    }, this.#shotInterval)
+  async #autoShot() {
+    await this.#wait(randomNumber(1000, 6000))
+    if (this._destroy) return
+    const bullet = new Bullet(this.bulletColor, 6, this)
+    this.stage!.add(bullet)
+    this.#autoShot()
   }
 
   #moveByDirection() {
