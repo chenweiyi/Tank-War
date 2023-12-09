@@ -1,6 +1,7 @@
 import { IDirection, IKeyBindMove, INode, ITankDirectionProperty, ITankType } from '../game'
 import Bullet from './Bullet'
 import Stage from './Stage'
+import { TANK_BULLET_COLOR, TANK_SCALE, TANK_SPEED } from './config'
 import { isBrick, isBullet, isCollision, isTank } from './utils'
 
 export default class Tank {
@@ -8,12 +9,15 @@ export default class Tank {
   x: number
   y: number
   direction: IDirection
-  speed: number = 4
+  speed: number = TANK_SPEED
   directionProperty: ITankDirectionProperty | undefined
   keybindMoveConfig: IKeyBindMove | undefined
   stage: InstanceType<typeof Stage> | undefined
-  scale = 1.2
-  bulletColor = '#fff'
+  scale = TANK_SCALE
+  bulletColor = TANK_BULLET_COLOR
+  keydownList: Set<string> = new Set()
+  keyHandlerInterval = 50
+  keyIntervalTimer: NodeJS.Timeout | undefined
   _destroy = false
 
   constructor({
@@ -22,8 +26,8 @@ export default class Tank {
     y,
     speed,
     direction,
-    scale = 1.2,
-    bulletColor = '#fff',
+    scale = TANK_SCALE,
+    bulletColor = TANK_BULLET_COLOR,
   }: {
     type: ITankType
     x: number
@@ -197,8 +201,28 @@ export default class Tank {
     }
   }
 
-  moveHandler(e: KeyboardEvent) {
-    switch (e.key) {
+  keydownMoveHandler(e: KeyboardEvent) {
+    console.log('e: ', e.key)
+    this.keydownList.add(e.key)
+  }
+
+  keydownShotHandler(e: KeyboardEvent) {
+    console.log('e: ', e.key)
+    this.keydownList.add(e.key)
+  }
+
+  keyupMoveHandler(e: KeyboardEvent) {
+    console.log('e: ', e.key)
+    this.keydownList.delete(e.key)
+  }
+
+  keyupShotHandler(e: KeyboardEvent) {
+    console.log('e: ', e.key)
+    this.keydownList.delete(e.key)
+  }
+
+  moveHandler(key: string) {
+    switch (key) {
       case this.keybindMoveConfig!['up']:
         this.moveUp()
         break
@@ -216,15 +240,15 @@ export default class Tank {
 
   bindMove() {
     if (this.keybindMoveConfig) {
-      document.addEventListener('keydown', this.moveHandler)
+      document.addEventListener('keydown', this.keydownMoveHandler)
+      document.addEventListener('keyup', this.keyupMoveHandler)
     } else {
       throw new Error(`type is [${this.type}]'s keybindMoveConfig is empty!`)
     }
   }
 
-  shotHandler(e: KeyboardEvent) {
-    // console.log('key:', e.key)
-    switch (e.key) {
+  shotHandler(key: string) {
+    switch (key) {
       case this.keybindMoveConfig!['shot']: {
         const bullet = new Bullet(this.bulletColor, 6, this)
         this.stage!.add(bullet)
@@ -235,30 +259,50 @@ export default class Tank {
 
   bindShot() {
     if (this.keybindMoveConfig) {
-      document.addEventListener('keydown', this.shotHandler)
+      document.addEventListener('keydown', this.keydownShotHandler)
+      document.addEventListener('keyup', this.keyupShotHandler)
     } else {
       throw new Error(`type is [${this.type}]'s keybindMoveConfig is empty!`)
     }
   }
 
   bindEvents() {
-    this.moveHandler = this.moveHandler.bind(this)
-    this.shotHandler = this.shotHandler.bind(this)
+    this.keydownMoveHandler = this.keydownMoveHandler.bind(this)
+    this.keyupMoveHandler = this.keyupMoveHandler.bind(this)
+    this.keydownShotHandler = this.keydownShotHandler.bind(this)
+    this.keyupShotHandler = this.keyupShotHandler.bind(this)
     this.bindMove()
     this.bindShot()
+
+    if (this.keyIntervalTimer !== undefined) {
+      clearInterval(this.keyIntervalTimer)
+    }
+    this.keyIntervalTimer = setInterval(() => {
+      if (this.keydownList.size > 0) {
+        for (const key of this.keydownList) {
+          this.moveHandler(key)
+          this.shotHandler(key)
+        }
+      }
+    }, this.keyHandlerInterval)
   }
 
   unbindMove() {
-    document.removeEventListener('keydown', this.moveHandler)
+    document.removeEventListener('keydown', this.keydownMoveHandler)
+    document.removeEventListener('keyup', this.keyupMoveHandler)
   }
 
   unbindShot() {
-    document.removeEventListener('keydown', this.shotHandler)
+    document.removeEventListener('keydown', this.keydownShotHandler)
+    document.removeEventListener('keyup', this.keydownShotHandler)
   }
 
   unbindEvents() {
     this.unbindMove()
     this.unbindShot()
+    if (this.keyIntervalTimer !== undefined) {
+      clearInterval(this.keyIntervalTimer)
+    }
   }
 
   destroy() {

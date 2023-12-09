@@ -7,6 +7,15 @@ import {
 } from '../game'
 import Bullet from './Bullet'
 import Tank from './Tank'
+import {
+  ENEMY_AUTO_SHOT_WAIT_TIME_PERIOD,
+  ENEMY_BULLET_COLOR,
+  ENEMY_BULLET_SPEED,
+  ENEMY_COLLISION_INTERVAL,
+  ENEMY_DIRECTION_PROPERTY,
+  ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD,
+  ENEMY_SPEED,
+} from './config'
 import { isBrick, isBullet, isTank, randomNumber } from './utils'
 
 function getRandomDirection() {
@@ -52,78 +61,22 @@ function getRandomEnemyTankType() {
 }
 
 export default class Enemy extends Tank {
-  #enemyDirectionProperty: IEnemyDirectionProperty = {
-    red: {
-      up: [3, 1, 26, 30],
-      down: [67, 1, 26, 30],
-      left: [97, 3, 30, 26],
-      right: [33, 3, 30, 26],
-    },
-    midRed: {
-      up: [3, 97, 26, 30],
-      down: [67, 97, 26, 30],
-      left: [97, 99, 30, 26],
-      right: [33, 99, 30, 26],
-    },
-    bigRed: {
-      up: [3, 225, 26, 30],
-      down: [67, 225, 26, 30],
-      left: [97, 227, 30, 26],
-      right: [33, 227, 30, 26],
-    },
-    sliver: {
-      up: [131, 1, 26, 30],
-      down: [195, 1, 26, 30],
-      left: [225, 3, 30, 26],
-      right: [161, 3, 30, 26],
-    },
-    midSliver: {
-      up: [131, 97, 26, 30],
-      down: [195, 97, 26, 30],
-      left: [225, 99, 30, 26],
-      right: [161, 99, 30, 26],
-    },
-    bigSliver: {
-      up: [131, 225, 26, 30],
-      down: [195, 225, 26, 30],
-      left: [225, 227, 30, 26],
-      right: [161, 227, 30, 26],
-    },
-    brown: {
-      up: [387, 1, 26, 30],
-      down: [451, 1, 26, 30],
-      left: [481, 3, 30, 26],
-      right: [417, 3, 30, 26],
-    },
-    midBrown: {
-      up: [387, 97, 26, 30],
-      down: [451, 97, 26, 30],
-      left: [481, 99, 30, 26],
-      right: [417, 99, 30, 26],
-    },
-    bigBrown: {
-      up: [387, 225, 26, 30],
-      down: [451, 225, 26, 30],
-      left: [481, 227, 30, 26],
-      right: [417, 227, 30, 26],
-    },
-  }
+  #enemyDirectionProperty: IEnemyDirectionProperty = ENEMY_DIRECTION_PROPERTY
   directionProperty: ITankDirectionProperty | undefined
   direction: IDirection
   #rqAF: number | undefined
   #timer: number | undefined
-  #collisionInterval: number = 500
+  #collisionInterval: number = ENEMY_COLLISION_INTERVAL
   #stopMove: boolean = false
-  #shotInterval = 3000
   #shotTimer: NodeJS.Timeout | undefined = undefined
 
   constructor({
     enemyType,
     x,
     y,
-    speed = 2,
+    speed = ENEMY_SPEED,
     direction,
-    bulletColor = '#fff',
+    bulletColor = ENEMY_BULLET_COLOR,
   }: {
     enemyType?: IEnemyTankType
     x: number
@@ -157,16 +110,20 @@ export default class Enemy extends Tank {
   }
 
   async #randomMove() {
-    await this.#wait(randomNumber(2000, 6000))
+    await this.#wait(
+      randomNumber(ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD[0], ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD[1]),
+    )
     if (this._destroy) return
     this.#thinkNext()
     this.#randomMove()
   }
 
   async #autoShot() {
-    await this.#wait(randomNumber(1000, 6000))
+    await this.#wait(
+      randomNumber(ENEMY_AUTO_SHOT_WAIT_TIME_PERIOD[0], ENEMY_AUTO_SHOT_WAIT_TIME_PERIOD[1]),
+    )
     if (this._destroy) return
-    const bullet = new Bullet(this.bulletColor, 6, this)
+    const bullet = new Bullet(this.bulletColor, ENEMY_BULLET_SPEED, this)
     this.stage!.add(bullet)
     this.#autoShot()
   }

@@ -1,26 +1,22 @@
 import { IDirection, IKeyBindMove, ITankDirectionProperty } from '../game'
 import Tank from './Tank'
+import {
+  PLAY2_BULLET_COLOR,
+  PLAY2_DIRECTION,
+  PLAY2_DIRECTION_PROPERTY,
+  PLAY2_KEYBINDING,
+  PLAY2_SPEED,
+} from './config'
 
 export default class Player1 extends Tank {
-  directionProperty: ITankDirectionProperty = {
-    up: [643, 3, 26, 26],
-    down: [707, 3, 26, 26],
-    left: [739, 3, 26, 26],
-    right: [675, 3, 26, 26],
-  }
-  keybindMoveConfig: IKeyBindMove = {
-    up: 'w',
-    down: 's',
-    left: 'a',
-    right: 'd',
-    shot: 'y',
-  }
+  directionProperty: ITankDirectionProperty = PLAY2_DIRECTION_PROPERTY
+  keybindMoveConfig: IKeyBindMove = PLAY2_KEYBINDING
   constructor({
     x,
     y,
-    speed = 6,
-    direction = 'down',
-    bulletColor = 'rgb(230,162,60)',
+    speed = PLAY2_SPEED,
+    direction = PLAY2_DIRECTION,
+    bulletColor = PLAY2_BULLET_COLOR,
   }: {
     x: number
     y: number

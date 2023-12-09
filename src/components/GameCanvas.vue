@@ -4,10 +4,11 @@ import Enemy from '../game/Enemy'
 import Player1 from '../game/Player1'
 import Player2 from '../game/Player2'
 import Stage from '../game/Stage.ts'
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../game/config'
 
 const canvasRef = ref()
-const w = ref(800)
-const h = ref(600)
+const w = ref(CANVAS_WIDTH)
+const h = ref(CANVAS_HEIGHT)
 
 onMounted(() => {
   const img = new Image()
@@ -20,10 +21,12 @@ onMounted(() => {
     const player2 = new Player2({ x: 500, y: 500, direction: 'up' })
     const enemy1 = new Enemy({ x: 0, y: 0, direction: 'down' })
     const enemy2 = new Enemy({ x: 750, y: 0, direction: 'left' })
+    const enemy3 = new Enemy({ x: 350, y: 0, direction: 'down' })
     stage.add(player1)
     stage.add(player2)
     stage.add(enemy1)
     stage.add(enemy2)
+    stage.add(enemy3)
     stage.start()
   }
 })
