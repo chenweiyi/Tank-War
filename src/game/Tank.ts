@@ -16,7 +16,7 @@ export default class Tank {
   scale = TANK_SCALE
   bulletColor = TANK_BULLET_COLOR
   keydownList: Set<string> = new Set()
-  keyHandlerInterval = 50
+  keyHandlerInterval = 80
   keyIntervalTimer: NodeJS.Timeout | undefined
   _destroy = false
 

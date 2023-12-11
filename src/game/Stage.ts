@@ -1,4 +1,6 @@
 import { INode } from '../game'
+import ExplodeProp from './ExplodeProp'
+import { isBullet, isEnemy } from './utils'
 
 export default class Stage {
   graghics: HTMLImageElement
@@ -39,12 +41,39 @@ export default class Stage {
     requestAnimationFrame(this.render.bind(this))
   }
 
+  initProps() {
+    // Generate a random prop
+    setTimeout(() => {
+      const explodeProp = new ExplodeProp(300, 300)
+      explodeProp.init(this.ctx, this.graghics)
+      explodeProp.addStage(this)
+      this.elements.push(explodeProp)
+    }, 3000)
+  }
+
   start() {
     this.render()
+    this.initProps()
   }
 
   destroy(node: INode) {
     node._destroy = true
     this.elements = this.elements.filter((element) => element !== node)
+  }
+
+  destroyEnemy() {
+    this.elements
+      .filter((element) => isEnemy(element))
+      .forEach((element) => {
+        element.destroy()
+      })
+  }
+
+  destroyEnemyBullet() {
+    this.elements
+      .filter((element) => isBullet(element) && isEnemy(element.source!))
+      .forEach((element) => {
+        element.destroy()
+      })
   }
 }

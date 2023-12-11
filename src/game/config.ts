@@ -110,3 +110,6 @@ export const ENEMY_BULLET_COLOR = '#fff'
 export const ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD = [1000, 3000]
 export const ENEMY_AUTO_SHOT_WAIT_TIME_PERIOD = [1000, 6000]
 export const ENEMY_BULLET_SPEED = 6
+
+// prop
+export const PROP_SCALE = 1

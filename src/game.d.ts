@@ -13,6 +13,7 @@ export interface INode {
   getRight: () => number
   getBottom: () => number
   gotCollision: (node: INode) => void // was collisioned
+  destroy: () => void
   source?: INode
   _destroy: boolean
 }
@@ -49,3 +50,7 @@ export interface IKeyBindMove {
   right: string
   shot: string
 }
+
+// prop
+export type IPropType = 'prop'
+export type IPropProperty = [number, number]

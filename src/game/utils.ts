@@ -44,6 +44,24 @@ export const isTank = (node: INode) => {
   )
 }
 
+export const isEnemy = (node: INode) => {
+  return (
+    node.type === 'red' ||
+    node.type === 'midRed' ||
+    node.type === 'bigRed' ||
+    node.type === 'sliver' ||
+    node.type === 'midSliver' ||
+    node.type === 'bigSliver' ||
+    node.type === 'brown' ||
+    node.type === 'midBrown' ||
+    node.type === 'bigBrown'
+  )
+}
+
+export const isPlayer = (node: INode) => {
+  return node.type === 'player1' || node.type === 'player2'
+}
+
 export const isBrick = (node: INode) => {
   return node.type === 'brick'
 }

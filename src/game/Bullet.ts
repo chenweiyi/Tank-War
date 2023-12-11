@@ -1,7 +1,7 @@
 import { IDirection, INode, IType } from '../game'
 import Stage from './Stage'
 import Tank from './Tank'
-import { isCollision } from './utils'
+import { isCollision, isProp } from './utils'
 
 const getShotBulletInitInfo = (source: InstanceType<typeof Tank>) => {
   const res: {
@@ -120,7 +120,7 @@ export default class Bullet {
       // out of stage
       this.destroy()
     } else if ((ele = isCollision(this, this.stage!.elements))) {
-      if (ele !== this.source) {
+      if (ele !== this.source && !isProp(ele)) {
         // collision
         this.destroy()
       }
