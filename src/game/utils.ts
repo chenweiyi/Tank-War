@@ -1,7 +1,7 @@
 import { INode } from '../game'
 
 export const isCollision = (node: INode, elements: INode[]) => {
-  const filterNodes = elements.filter((ele) => ele !== node)
+  const filterNodes = elements.filter((ele) => ele !== node && !ele._destroy)
   const circleLeft = node.getLeft()
   const circleRight = node.getRight()
   const circleTop = node.getTop()
@@ -63,18 +63,18 @@ export const isPlayer = (node: INode) => {
 }
 
 export const isBrick = (node: INode) => {
-  return node.type === 'brick'
+  return node.type.toLowerCase().includes('brick')
 }
 
 /**
  * 是否是道具
  */
 export const isProp = (node: INode) => {
-  return node.type === 'prop'
+  return node.type.toLowerCase().includes('prop')
 }
 
 export const isBullet = (node: INode) => {
-  return node.type === 'bullet'
+  return node.type.toLowerCase().includes('bullet')
 }
 
 /**

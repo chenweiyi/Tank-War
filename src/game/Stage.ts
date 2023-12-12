@@ -1,4 +1,5 @@
 import { INode } from '../game'
+import AdobeBrick from './AdobeBrick'
 import ExplodeProp from './ExplodeProp'
 import { isBullet, isEnemy } from './utils'
 
@@ -51,9 +52,17 @@ export default class Stage {
     }, 3000)
   }
 
+  initBrick() {
+    const adobeBrick = new AdobeBrick(100, 100)
+    adobeBrick.init(this.ctx, this.graghics)
+    adobeBrick.addStage(this)
+    this.elements.push(adobeBrick)
+  }
+
   start() {
     this.render()
     this.initProps()
+    this.initBrick()
   }
 
   destroy(node: INode) {

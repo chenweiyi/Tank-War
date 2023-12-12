@@ -1,6 +1,6 @@
 import Stage from './game/Stage'
 
-export type IType = ITankType | 'bullet' | 'brick' | 'prop'
+export type IType = ITankType | 'bullet' | IBrickType | 'prop'
 
 // stage
 export interface INode {
@@ -54,3 +54,6 @@ export interface IKeyBindMove {
 // prop
 export type IPropType = 'prop'
 export type IPropProperty = [number, number]
+
+// brick
+export type IBrickType = 'brick' | 'adobeBrick'

@@ -113,3 +113,6 @@ export const ENEMY_BULLET_SPEED = 6
 
 // prop
 export const PROP_SCALE = 1
+
+// brick
+export const BRICK_SCALE = 1
