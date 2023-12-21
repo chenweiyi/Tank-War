@@ -1,5 +1,7 @@
 import { IEnemyDirectionProperty, IKeyBindMove, ITankDirectionProperty } from '../game'
 
+export const ENEMY_KILL_EACH_OTHER = false
+export const PLAYER_KILL_EACH_OTHER = false
 // canvas
 export const CANVAS_WIDTH = 800
 export const CANVAS_HEIGHT = 600

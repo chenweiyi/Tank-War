@@ -10,14 +10,22 @@ export default class Prop {
   scale = PROP_SCALE
   stage: InstanceType<typeof Stage> | undefined
   property: IPropProperty | undefined
+  duration: number = Infinity
   _destroy = false
 
-  constructor(x: number, y: number) {
+  constructor(x: number, y: number, duration?: number) {
     this.x = x
     this.y = y
+    this.duration = duration || Infinity
   }
 
-  init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {}
+  init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
+    if (this.duration < Infinity) {
+      setTimeout(() => {
+        this.destroy()
+      }, this.duration)
+    }
+  }
 
   draw(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {}
 

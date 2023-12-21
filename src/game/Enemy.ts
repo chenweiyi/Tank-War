@@ -13,10 +13,11 @@ import {
   ENEMY_BULLET_SPEED,
   ENEMY_COLLISION_INTERVAL,
   ENEMY_DIRECTION_PROPERTY,
+  ENEMY_KILL_EACH_OTHER,
   ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD,
   ENEMY_SPEED,
 } from './config'
-import { isBrick, isBullet, isTank, randomNumber } from './utils'
+import { isBrick, isBullet, isEnemy, isSameType, isTank, randomNumber } from './utils'
 
 function getRandomDirection() {
   const directions: IDirection[] = ['up', 'down', 'left', 'right']
@@ -56,6 +57,8 @@ function getRandomEnemyTankType() {
     'midSliver',
     'bigSliver',
     'brown',
+    'midBrown',
+    'bigBrown',
   ]
   return enemyTankTypes[Math.floor(Math.random() * enemyTankTypes.length)]
 }
@@ -78,7 +81,7 @@ export default class Enemy extends Tank {
     direction,
     bulletColor = ENEMY_BULLET_COLOR,
   }: {
-    enemyType?: IEnemyTankType
+    enemyType?: IEnemyTankType | 'random'
     x: number
     y: number
     speed?: number
@@ -87,7 +90,7 @@ export default class Enemy extends Tank {
   }) {
     const enemyDirection = getRandomDirection()
     const enemyTankType = getRandomEnemyTankType()
-    const type = enemyType || enemyTankType
+    const type = enemyType === 'random' || !enemyType ? enemyTankType : enemyType
     const direction0 = direction || enemyDirection
     super({ type, x, y, speed, direction: direction0, bulletColor })
     this.directionProperty = this.#enemyDirectionProperty[type]
@@ -154,7 +157,17 @@ export default class Enemy extends Tank {
   collisionOther(node: INode) {
     if (isBrick(node) || isTank(node)) {
       this.#thinkNext()
-    } else if (isBullet(node) && node.source !== this) {
+    } else if (isBullet(node) && node.source !== this && !isSameType(node.source!, this)) {
+      console.log('11', node.source?.type, this.type)
+      this.destroy()
+    } else if (
+      isBullet(node) &&
+      node.source !== this &&
+      isSameType(node.source!, this) &&
+      // @ts-ignore
+      ENEMY_KILL_EACH_OTHER === true
+    ) {
+      console.log('22', node.source?.type, this.type)
       this.destroy()
     }
   }

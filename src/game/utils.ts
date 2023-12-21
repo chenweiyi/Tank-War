@@ -67,6 +67,29 @@ export const isBrick = (node: INode) => {
 }
 
 /**
+ * judge other if is same to me type
+ */
+export const isSameType = (me: INode, other: INode) => {
+  if (isEnemy(me)) {
+    return isEnemy(other)
+  }
+  if (isPlayer(me)) {
+    return isPlayer(other)
+  }
+  if (isBullet(me)) {
+    return isBullet(other)
+  }
+  if (isProp(me)) {
+    return isProp(other)
+  }
+  return false
+}
+
+export const isBothTank = (me: INode, other: INode) => {
+  return isTank(me) && isTank(other)
+}
+
+/**
  * 是否是道具
  */
 export const isProp = (node: INode) => {
@@ -82,4 +105,23 @@ export const isBullet = (node: INode) => {
  */
 export const randomNumber = (start: number, end: number) => {
   return start + Math.floor(Math.random() * (end - start))
+}
+
+export const sleep = async (time: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, time)
+  })
+}
+
+/**
+ * 获取介于两数之间的随机数
+ */
+export const randomBetween = (min: number, max: number) => {
+  let _min = min
+  let _max = max
+  if (min > max) {
+    _min = max
+    _max = min
+  }
+  return Math.floor(Math.random() * (_max - _min)) + _min
 }

@@ -57,3 +57,93 @@ export type IPropProperty = [number, number]
 
 // brick
 export type IBrickType = 'brick' | 'adobeBrick'
+
+// maps
+export interface IMapProp {
+  containerWidth: number
+  containerHeight: number
+}
+
+export interface IMapPlayer {
+  position: {
+    x: number
+    y: number
+    direction: IDirection
+  }
+}
+
+export interface IMapBrick {
+  /**
+   * brick start coordinate
+   */
+  start: [number, number]
+  /**
+   * horizontal number
+   */
+  horizontal: number
+  /**
+   * vertial number
+   */
+  vertial: number
+  /**
+   * current area all bricks coordinate, include start element
+   */
+  eles?: Array<[number, number]>
+}
+
+export interface IMapInfo {
+  /**
+   * current level number , from 1 start
+   */
+  level: number
+  player1: IMapPlayer
+  player2: IMapPlayer
+  enemy: {
+    /**
+     * tank type, two-dimensional arrays , value can be 'random' | IEnemyTankType
+     */
+    type: Array<Array<IEnemyTankType | 'random'>>
+    /**
+     * how many count enemy
+     */
+    number: number
+    /**
+     * every count interval
+     */
+    interval: number
+    /**
+     * every count enemy tank's info
+     */
+    info?: Array<
+      Array<{
+        type: IEnemyTankType | 'random'
+        position: [number, number, IDirection]
+      }>
+    >
+  }
+  bricks: Array<IMapBrick>
+  props: {
+    explodeProp: {
+      /**
+       * occur interval time
+       */
+      interval: number
+      /**
+       * number per occur
+       */
+      perCount: number
+      /**
+       * prop lives time
+       */
+      duration: number
+      /**
+       * max number for every level
+       */
+      max: number
+      /**
+       * prop occur position
+       */
+      position: 'random' | [number, number]
+    }
+  }
+}

@@ -4,8 +4,8 @@ import { isPlayer, isTank } from './utils'
 
 export default class ExplodeProp extends Prop {
   property: IPropProperty = [32, 30]
-  constructor(x: number, y: number) {
-    super(x, y)
+  constructor(x: number, y: number, duration: number) {
+    super(x, y, duration)
   }
 
   draw(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {

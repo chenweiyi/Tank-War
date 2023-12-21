@@ -1,8 +1,14 @@
 import { IDirection, IKeyBindMove, INode, ITankDirectionProperty, ITankType } from '../game'
 import Bullet from './Bullet'
 import Stage from './Stage'
-import { TANK_BULLET_COLOR, TANK_SCALE, TANK_SPEED } from './config'
-import { isBrick, isBullet, isCollision, isTank } from './utils'
+import {
+  ENEMY_KILL_EACH_OTHER,
+  PLAYER_KILL_EACH_OTHER,
+  TANK_BULLET_COLOR,
+  TANK_SCALE,
+  TANK_SPEED,
+} from './config'
+import { isBrick, isBullet, isCollision, isEnemy, isPlayer, isSameType, isTank } from './utils'
 
 export default class Tank {
   type: ITankType
@@ -78,7 +84,26 @@ export default class Tank {
    */
   gotCollision(node: INode) {
     if (node.type === 'bullet') {
-      if (node.source !== this) {
+      if (node.source !== this && !isSameType(this, node.source!)) {
+        console.log('1', this.type, node.source!.type)
+        this.destroy()
+      } else if (
+        node.source !== this &&
+        isSameType(this, node.source!) &&
+        isEnemy(this) &&
+        // @ts-ignore
+        ENEMY_KILL_EACH_OTHER === true
+      ) {
+        console.log('2', this.type, node.source!.type)
+        this.destroy()
+      } else if (
+        node.source !== this &&
+        isSameType(this, node.source!) &&
+        isPlayer(this) &&
+        // @ts-ignore
+        PLAYER_KILL_EACH_OTHER === true
+      ) {
+        console.log('3', this.type, node.source!.type)
         this.destroy()
       }
     }
@@ -129,7 +154,7 @@ export default class Tank {
         this.y += this.speed
         this.collisionOther(collision)
       } else if (isBullet(collision) && collision.source !== this) {
-        this.destroy()
+        this.collisionOther(collision)
         return
       }
     }
@@ -149,7 +174,7 @@ export default class Tank {
         this.y -= this.speed
         this.collisionOther(collision)
       } else if (isBullet(collision) && collision.source !== this) {
-        this.destroy()
+        this.collisionOther(collision)
         return
       }
     }
@@ -169,7 +194,7 @@ export default class Tank {
         this.x += this.speed
         this.collisionOther(collision)
       } else if (isBullet(collision) && collision.source !== this) {
-        this.destroy()
+        this.collisionOther(collision)
         return
       }
     }
@@ -190,7 +215,7 @@ export default class Tank {
         this.x -= this.speed
         this.collisionOther(collision)
       } else if (isBullet(collision) && collision.source !== this) {
-        this.destroy()
+        this.collisionOther(collision)
         return
       }
     }

@@ -1,7 +1,8 @@
 import { IDirection, INode, IType } from '../game'
 import Stage from './Stage'
 import Tank from './Tank'
-import { isCollision, isProp } from './utils'
+import { ENEMY_KILL_EACH_OTHER, PLAYER_KILL_EACH_OTHER } from './config'
+import { isBothTank, isBrick, isCollision, isEnemy, isPlayer, isProp, isSameType } from './utils'
 
 const getShotBulletInitInfo = (source: InstanceType<typeof Tank>) => {
   const res: {
@@ -77,7 +78,23 @@ export default class Bullet {
   }
 
   gotCollision(node: INode) {
-    if (node !== this.source) {
+    if (node !== this.source && !isSameType(this.source, node)) {
+      this.destroy()
+    } else if (
+      node !== this.source &&
+      isSameType(this.source, node) &&
+      isEnemy(this.source) &&
+      // @ts-ignore
+      ENEMY_KILL_EACH_OTHER === true
+    ) {
+      this.destroy()
+    } else if (
+      node !== this.source &&
+      isSameType(this.source, node) &&
+      isPlayer(this.source) &&
+      // @ts-ignore
+      PLAYER_KILL_EACH_OTHER === true
+    ) {
       this.destroy()
     }
   }
@@ -120,8 +137,29 @@ export default class Bullet {
       // out of stage
       this.destroy()
     } else if ((ele = isCollision(this, this.stage!.elements))) {
-      if (ele !== this.source && !isProp(ele)) {
-        // collision
+      if (ele !== this.source && isBrick(ele)) {
+        this.destroy()
+      } else if (
+        ele !== this.source &&
+        isEnemy(ele) &&
+        isSameType(this.source, ele) &&
+        // @ts-ignore
+        ENEMY_KILL_EACH_OTHER === true
+      ) {
+        this.destroy()
+      } else if (
+        ele !== this.source &&
+        isPlayer(ele) &&
+        isSameType(this.source, ele) &&
+        // @ts-ignore
+        PLAYER_KILL_EACH_OTHER === true
+      ) {
+        this.destroy()
+      } else if (
+        ele !== this.source &&
+        !isSameType(this.source, ele) &&
+        isBothTank(this.source, ele)
+      ) {
         this.destroy()
       }
     } else {
