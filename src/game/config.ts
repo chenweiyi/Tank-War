@@ -118,3 +118,6 @@ export const PROP_SCALE = 1
 
 // brick
 export const BRICK_SCALE = 1
+
+// king
+export const KING_SCALE = 1

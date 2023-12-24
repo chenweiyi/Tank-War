@@ -11,6 +11,7 @@ import {
 export default class Player1 extends Tank {
   directionProperty: ITankDirectionProperty = PLAY1_DIRECTION_PROPERTY
   keybindMoveConfig: IKeyBindMove = PLAY1_KEYBINDING
+  _pause = false
   constructor({
     x,
     y,
@@ -26,5 +27,9 @@ export default class Player1 extends Tank {
   }) {
     super({ type: 'player1', x, y, speed, direction, bulletColor })
     this.bindEvents()
+  }
+
+  pauseEventCallback() {
+    this.keydownList.clear()
   }
 }

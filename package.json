@@ -15,6 +15,7 @@
     "@unocss/preset-uno": "^0.57.7",
     "@unocss/transformer-attributify-jsx": "^0.57.7",
     "dayjs": "^1.11.10",
+    "element-plus": "^2.4.4",
     "lodash-es": "^4.17.21",
     "unocss": "^0.57.7",
     "vue": "^3.3.8"

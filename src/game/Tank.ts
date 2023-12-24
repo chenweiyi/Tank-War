@@ -1,5 +1,6 @@
 import { IDirection, IKeyBindMove, INode, ITankDirectionProperty, ITankType } from '../game'
 import Bullet from './Bullet'
+import EventSync from './EventSync'
 import Stage from './Stage'
 import {
   ENEMY_KILL_EACH_OTHER,
@@ -8,9 +9,18 @@ import {
   TANK_SCALE,
   TANK_SPEED,
 } from './config'
-import { isBrick, isBullet, isCollision, isEnemy, isPlayer, isSameType, isTank } from './utils'
+import {
+  isBrick,
+  isBullet,
+  isCollision,
+  isEnemy,
+  isKing,
+  isPlayer,
+  isSameType,
+  isTank,
+} from './utils'
 
-export default class Tank {
+export default class Tank extends EventSync {
   type: ITankType
   x: number
   y: number
@@ -25,6 +35,7 @@ export default class Tank {
   keyHandlerInterval = 80
   keyIntervalTimer: NodeJS.Timeout | undefined
   _destroy = false
+  _pause = false
 
   constructor({
     type,
@@ -43,6 +54,7 @@ export default class Tank {
     scale?: number
     bulletColor?: string
   }) {
+    super()
     this.type = type
     this.x = x
     this.y = y
@@ -52,7 +64,9 @@ export default class Tank {
     this.bulletColor = bulletColor
   }
 
-  init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {}
+  init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
+    this.bindEventBus()
+  }
 
   addStage(stage: InstanceType<typeof Stage>) {
     this.stage = stage
@@ -121,6 +135,7 @@ export default class Tank {
   collisionStage() {}
 
   draw(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
+    if (this._destroy) return
     if (this.directionProperty) {
       ctx.drawImage(
         graghics,
@@ -149,7 +164,7 @@ export default class Tank {
     this.y -= this.speed
     const collision = isCollision(this, this.stage!.elements)
     if (collision) {
-      if (isBrick(collision) || isTank(collision)) {
+      if (isBrick(collision) || isTank(collision) || isKing(collision)) {
         // if collision restore y
         this.y += this.speed
         this.collisionOther(collision)
@@ -169,7 +184,7 @@ export default class Tank {
     this.y += this.speed
     const collision = isCollision(this, this.stage!.elements)
     if (collision) {
-      if (isBrick(collision) || isTank(collision)) {
+      if (isBrick(collision) || isTank(collision) || isKing(collision)) {
         // if collision restore y
         this.y -= this.speed
         this.collisionOther(collision)
@@ -189,7 +204,7 @@ export default class Tank {
     this.x -= this.speed
     const collision = isCollision(this, this.stage!.elements)
     if (collision) {
-      if (isBrick(collision) || isTank(collision)) {
+      if (isBrick(collision) || isTank(collision) || isKing(collision)) {
         // if collision restore x
         this.x += this.speed
         this.collisionOther(collision)
@@ -210,7 +225,7 @@ export default class Tank {
     this.x += this.speed
     const collision = isCollision(this, this.stage!.elements)
     if (collision) {
-      if (isBrick(collision) || isTank(collision)) {
+      if (isBrick(collision) || isTank(collision) || isKing(collision)) {
         // if collision restore x
         this.x -= this.speed
         this.collisionOther(collision)
@@ -228,22 +243,30 @@ export default class Tank {
 
   keydownMoveHandler(e: KeyboardEvent) {
     console.log('e: ', e.key)
-    this.keydownList.add(e.key)
+    if (!this._pause) {
+      this.keydownList.add(e.key)
+    }
   }
 
   keydownShotHandler(e: KeyboardEvent) {
     console.log('e: ', e.key)
-    this.keydownList.add(e.key)
+    if (!this._pause) {
+      this.keydownList.add(e.key)
+    }
   }
 
   keyupMoveHandler(e: KeyboardEvent) {
     console.log('e: ', e.key)
-    this.keydownList.delete(e.key)
+    if (!this._pause) {
+      this.keydownList.delete(e.key)
+    }
   }
 
   keyupShotHandler(e: KeyboardEvent) {
     console.log('e: ', e.key)
-    this.keydownList.delete(e.key)
+    if (!this._pause) {
+      this.keydownList.delete(e.key)
+    }
   }
 
   moveHandler(key: string) {
@@ -332,6 +355,7 @@ export default class Tank {
 
   destroy() {
     this.unbindEvents()
+    this.unbindEventBus()
     this.stage!.destroy(this)
   }
 }

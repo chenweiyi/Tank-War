@@ -1,5 +1,19 @@
 import { INode } from '../game'
 
+export interface IElementPos {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+export const judgeCollision = (a: IElementPos, b: IElementPos) => {
+  if (a.x > b.x + b.w || a.x + a.w < b.x || a.y > b.y + b.h || a.y + a.h < b.y) {
+    return false
+  }
+  return true
+}
+
 export const isCollision = (node: INode, elements: INode[]) => {
   const filterNodes = elements.filter((ele) => ele !== node && !ele._destroy)
   const circleLeft = node.getLeft()
@@ -66,6 +80,10 @@ export const isBrick = (node: INode) => {
   return node.type.toLowerCase().includes('brick')
 }
 
+export const isKing = (node: INode) => {
+  return node.type.toLowerCase().includes('king')
+}
+
 /**
  * judge other if is same to me type
  */
@@ -81,6 +99,9 @@ export const isSameType = (me: INode, other: INode) => {
   }
   if (isProp(me)) {
     return isProp(other)
+  }
+  if (isKing(me)) {
+    return isKing(other)
   }
   return false
 }

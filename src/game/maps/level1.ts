@@ -55,15 +55,30 @@ const mapConfig: (props: IMapProp) => IMapInfo = (props) => {
         horizontal: 6,
         vertial: 2,
       },
+      {
+        start: [352, 536],
+        horizontal: 3,
+        vertial: 1,
+      },
+      {
+        start: [352, 568],
+        horizontal: 1,
+        vertial: 1,
+      },
+      {
+        start: [416, 568],
+        horizontal: 1,
+        vertial: 1,
+      },
     ],
     props: {
       explodeProp: {
         // occur interval time
-        interval: 5000,
+        interval: 30000,
         // number per occur
         perCount: 1,
         // live time
-        duration: 3000,
+        duration: 15000,
         // max number for every level
         max: 2,
         // prop position, string | [number, number]

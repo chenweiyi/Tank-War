@@ -3,6 +3,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import { CodeInspectorPlugin } from 'code-inspector-plugin'
 import UnoCSS from 'unocss/vite'
 import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vite'
 
@@ -20,6 +21,7 @@ export default defineConfig({
           names: ['RouterLink', 'RouterView'],
         },
       ],
+      resolvers: [ElementPlusResolver()],
     }),
     AutoImport({
       include: [
@@ -44,6 +46,7 @@ export default defineConfig({
           'lodash-es': ['cloneDeep', 'isNil', 'isEmpty', 'isString', 'isNumber', 'isArray'],
         },
       ],
+      resolvers: [ElementPlusResolver()],
     }),
     CodeInspectorPlugin({
       bundler: 'vite',

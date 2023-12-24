@@ -1,11 +1,21 @@
-import { IDirection, IMapBrick, IMapInfo, IMapProp, INode } from '../game'
+import { IDirection, IMapBrick, IMapInfo, IMapProp, INode, IType } from '../game'
 import AdobeBrick from './AdobeBrick'
 import Enemy from './Enemy'
 import ExplodeProp from './ExplodeProp'
+import King from './King'
 import Player1 from './Player1'
 import Player2 from './Player2'
 import map from './maps'
-import { isBullet, isEnemy, randomBetween, sleep } from './utils'
+import {
+  IElementPos,
+  isBrick,
+  isBullet,
+  isEnemy,
+  isTank,
+  judgeCollision,
+  randomBetween,
+  sleep,
+} from './utils'
 
 export default class Stage {
   graghics: HTMLImageElement
@@ -87,32 +97,83 @@ export default class Stage {
 
   #addPropsConfig(mapConfig: IMapInfo) {}
 
-  #addEnemiesConfig(mapConfig: IMapInfo) {
-    const getPosition: (index: number) => [number, number, IDirection] = (index) => {
-      switch (index) {
-        case 0:
-          return [0, 0, 'down']
-        case 1:
-          return [350, 0, 'down']
-        case 2:
-          return [750, 0, 'down']
+  #genPositions(number: number) {
+    const getProperPosition: (
+      pos: IElementPos,
+      direction: 'right' | 'left',
+      list: INode[],
+    ) => IElementPos = (pos, direction, list) => {
+      const element = list
+        .filter((ele) => !ele._destroy)
+        .filter((ele) => isTank(ele) || isBrick(ele))
+        .find((ele) => {
+          return judgeCollision(pos, {
+            x: ele.getLeft(),
+            y: ele.getTop(),
+            w: ele.getRight() - ele.getLeft(),
+            h: ele.getBottom() - ele.getTop(),
+          })
+        })
+      if (element) {
+        let newX, newY
+        switch (direction) {
+          case 'right':
+            newX = pos.x + pos.w + 10
+            newY = pos.y + pos.h + 10
+            if (newX + pos.w > this.w) {
+              // change next line, change direction to left
+              return getProperPosition({ ...pos, y: newY }, 'left', list)
+            } else {
+              // add x, keep right direction
+              return getProperPosition({ ...pos, x: newX }, 'right', list)
+            }
+          case 'left':
+            newX = pos.x - pos.w - 10
+            newY = pos.y + pos.h + 10
+            if (newX < 0) {
+              // change next line, change direction to right
+              return getProperPosition({ ...pos, y: newY }, 'right', list)
+            } else {
+              // subtract x, keep left direction
+              return getProperPosition({ ...pos, x: newX }, 'left', list)
+            }
+        }
+      } else {
+        return pos
       }
-      return [0, 0, 'down']
     }
 
-    const info: Required<IMapInfo['enemy']>['info'] = []
-    mapConfig.enemy.type.forEach((type) => {
-      const item: Required<IMapInfo['enemy']>['info'][0] = []
-      type.forEach((t, i) => {
-        item.push({
-          type: t,
-          position: getPosition(i),
-        })
-      })
-      info.push(item)
-    })
-    mapConfig.enemy.info = info
+    const res: IElementPos[] = []
+    if (number === 0) return []
+    for (let i = 0; i < number; i++) {
+      const list: INode[] = [
+        ...this.elements,
+        ...res.map((r) => ({
+          _destroy: false,
+          getLeft: () => r.x,
+          getTop: () => r.y,
+          getRight: () => r.x + r.w,
+          getBottom: () => r.y + r.h,
+          type: 'brick' as IType,
+          draw: () => {},
+          addStage: () => {},
+          gotCollision: () => {},
+          destroy: () => {},
+        })),
+      ]
+      const pos = getProperPosition(
+        { x: 0 + Math.floor(this.w / number) * i, y: 0, w: 32, h: 32 },
+        i < number / 2 ? 'right' : 'left',
+        list,
+      )
+
+      res.push(pos)
+    }
+
+    return res
   }
+
+  #addEnemiesConfig(mapConfig: IMapInfo) {}
 
   #addBricksConfig(mapConfig: IMapInfo) {
     mapConfig.bricks.map((brick) => {
@@ -138,6 +199,12 @@ export default class Stage {
     this.#renderPlayer()
     this.#renderEnemy()
     this.#renderProp()
+    this.#renderKing()
+  }
+
+  #renderKing() {
+    const king = new King(this.w, this.h)
+    this.add(king)
   }
 
   #renderBrick() {
@@ -153,26 +220,32 @@ export default class Stage {
   #renderPlayer() {
     if (this.currentLevelMapInfo) {
       const player1Option = this.currentLevelMapInfo.player1
-      const player1 = new Player1({ ...player1Option.position })
-      this.add(player1)
+      if (player1Option) {
+        const player1 = new Player1({ ...player1Option.position })
+        this.add(player1)
+      }
 
       const player2Option = this.currentLevelMapInfo.player2
-      const player2 = new Player2({ ...player2Option.position })
-      this.add(player2)
+      if (player2Option) {
+        const player2 = new Player2({ ...player2Option.position })
+        this.add(player2)
+      }
     }
   }
 
   async #renderEnemy() {
     if (this.currentLevelMapInfo) {
       const enemyOption = this.currentLevelMapInfo.enemy
-      for (let i = 0; i < enemyOption.info!.length; i++) {
-        const item = enemyOption.info![i]
-        item.forEach((e) => {
+      for (let i = 0; i < enemyOption.type.length; i++) {
+        const item = enemyOption.type[i]
+        const positions = this.#genPositions(item.length)
+        item.forEach((e, i) => {
+          const pos = positions[i]
           const enemy = new Enemy({
-            x: e.position[0],
-            y: e.position[1],
-            direction: e.position[2],
-            enemyType: e.type,
+            x: pos.x,
+            y: pos.y,
+            direction: 'down',
+            enemyType: e,
           })
           this.add(enemy)
         })
@@ -214,4 +287,18 @@ export default class Stage {
         element.destroy()
       })
   }
+
+  pause() {
+    window.$eventBus.emit({
+      eventName: 'pause',
+    })
+  }
+
+  resume() {
+    window.$eventBus.emit({
+      eventName: 'resume',
+    })
+  }
+
+  restart() {}
 }

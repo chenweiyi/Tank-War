@@ -17,7 +17,7 @@ import {
   ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD,
   ENEMY_SPEED,
 } from './config'
-import { isBrick, isBullet, isEnemy, isSameType, isTank, randomNumber } from './utils'
+import { isBrick, isBullet, isKing, isSameType, isTank, randomNumber } from './utils'
 
 function getRandomDirection() {
   const directions: IDirection[] = ['up', 'down', 'left', 'right']
@@ -99,6 +99,14 @@ export default class Enemy extends Tank {
   }
 
   init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
+    this.bindEventBus()
+    this.#moveByDirection()
+    this.#autoShot()
+    this.#randomMove()
+  }
+
+  resumeEventCallback() {
+    this.#stopMove = false
     this.#moveByDirection()
     this.#autoShot()
     this.#randomMove()
@@ -117,6 +125,7 @@ export default class Enemy extends Tank {
       randomNumber(ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD[0], ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD[1]),
     )
     if (this._destroy) return
+    if (this._pause) return
     this.#thinkNext()
     this.#randomMove()
   }
@@ -126,6 +135,7 @@ export default class Enemy extends Tank {
       randomNumber(ENEMY_AUTO_SHOT_WAIT_TIME_PERIOD[0], ENEMY_AUTO_SHOT_WAIT_TIME_PERIOD[1]),
     )
     if (this._destroy) return
+    if (this._pause) return
     const bullet = new Bullet(this.bulletColor, ENEMY_BULLET_SPEED, this)
     this.stage!.add(bullet)
     this.#autoShot()
@@ -133,6 +143,8 @@ export default class Enemy extends Tank {
 
   #moveByDirection() {
     const move = () => {
+      if (this._destroy) return
+      if (this._pause) return
       switch (this.direction) {
         case 'up':
           this.moveUp()
@@ -155,7 +167,7 @@ export default class Enemy extends Tank {
   }
 
   collisionOther(node: INode) {
-    if (isBrick(node) || isTank(node)) {
+    if (isBrick(node) || isTank(node) || isKing(node)) {
       this.#thinkNext()
     } else if (isBullet(node) && node.source !== this && !isSameType(node.source!, this)) {
       console.log('11', node.source?.type, this.type)
@@ -198,6 +210,7 @@ export default class Enemy extends Tank {
   unbindEvents(): void {}
 
   destroy() {
+    this.unbindEventBus()
     this.#rqAF !== undefined && cancelAnimationFrame(this.#rqAF)
     this.#timer !== undefined && clearTimeout(this.#timer)
     this.#shotTimer !== undefined && clearInterval(this.#shotTimer)

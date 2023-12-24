@@ -1,8 +1,18 @@
 import { IDirection, INode, IType } from '../game'
+import EventSync from './EventSync'
 import Stage from './Stage'
 import Tank from './Tank'
 import { ENEMY_KILL_EACH_OTHER, PLAYER_KILL_EACH_OTHER } from './config'
-import { isBothTank, isBrick, isCollision, isEnemy, isPlayer, isProp, isSameType } from './utils'
+import {
+  isBothTank,
+  isBrick,
+  isCollision,
+  isEnemy,
+  isKing,
+  isPlayer,
+  isProp,
+  isSameType,
+} from './utils'
 
 const getShotBulletInitInfo = (source: InstanceType<typeof Tank>) => {
   const res: {
@@ -39,7 +49,7 @@ const getShotBulletInitInfo = (source: InstanceType<typeof Tank>) => {
   return res
 }
 
-export default class Bullet {
+export default class Bullet extends EventSync {
   type: IType = 'bullet'
   color: string = '#fff'
   speed: number = 4
@@ -52,6 +62,7 @@ export default class Bullet {
   _destroy = false
 
   constructor(color: string, speed: number, source: InstanceType<typeof Tank>) {
+    super()
     this.color = color
     this.speed = speed
     this.source = source
@@ -59,6 +70,11 @@ export default class Bullet {
     this.direction = direction
     this.x = x
     this.y = y
+  }
+
+  init(ctx: CanvasRenderingContext2D) {
+    this.bindEventBus()
+    this.#draw(ctx)
   }
 
   getLeft() {
@@ -99,10 +115,6 @@ export default class Bullet {
     }
   }
 
-  init(ctx: CanvasRenderingContext2D) {
-    this.#draw(ctx)
-  }
-
   #draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
     ctx.beginPath()
@@ -118,6 +130,11 @@ export default class Bullet {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    if (this._destroy) return
+    if (this._pause) {
+      this.#draw(ctx)
+      return
+    }
     switch (this.direction) {
       case 'up':
         this.y -= this.speed
@@ -137,7 +154,7 @@ export default class Bullet {
       // out of stage
       this.destroy()
     } else if ((ele = isCollision(this, this.stage!.elements))) {
-      if (ele !== this.source && isBrick(ele)) {
+      if (ele !== this.source && (isBrick(ele) || isKing(ele))) {
         this.destroy()
       } else if (
         ele !== this.source &&
@@ -168,6 +185,7 @@ export default class Bullet {
   }
 
   destroy() {
+    this.unbindEventBus()
     this.stage!.destroy(this)
   }
 }

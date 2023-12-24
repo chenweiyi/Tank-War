@@ -1,9 +1,10 @@
 import { INode, IPropProperty, IPropType } from '../game'
+import EventSync from './EventSync'
 import Stage from './Stage'
 import { PROP_SCALE } from './config'
-import { isEnemy, isTank } from './utils'
+import { isTank } from './utils'
 
-export default class Prop {
+export default class Prop extends EventSync {
   type: IPropType = 'prop'
   x: number
   y: number
@@ -11,17 +12,32 @@ export default class Prop {
   stage: InstanceType<typeof Stage> | undefined
   property: IPropProperty | undefined
   duration: number = Infinity
+  #timer: NodeJS.Timeout | undefined
   _destroy = false
 
   constructor(x: number, y: number, duration?: number) {
+    super()
     this.x = x
     this.y = y
     this.duration = duration || Infinity
   }
 
   init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
+    this.#destroyWhenTimeCome()
+  }
+
+  pauseEventCallback() {
+    clearTimeout(this.#timer)
+  }
+
+  resumeEventCallback() {
+    this.#destroyWhenTimeCome()
+  }
+
+  #destroyWhenTimeCome() {
     if (this.duration < Infinity) {
-      setTimeout(() => {
+      this.#timer = setTimeout(() => {
+        if (this._destroy) return
         this.destroy()
       }, this.duration)
     }
@@ -60,6 +76,7 @@ export default class Prop {
   }
 
   destroy() {
+    clearTimeout(this.#timer)
     this.stage!.destroy(this)
   }
 }

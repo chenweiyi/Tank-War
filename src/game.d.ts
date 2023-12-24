@@ -1,6 +1,6 @@
 import Stage from './game/Stage'
 
-export type IType = ITankType | 'bullet' | IBrickType | 'prop'
+export type IType = ITankType | 'bullet' | IBrickType | 'prop' | 'king'
 
 // stage
 export interface INode {
@@ -111,15 +111,6 @@ export interface IMapInfo {
      * every count interval
      */
     interval: number
-    /**
-     * every count enemy tank's info
-     */
-    info?: Array<
-      Array<{
-        type: IEnemyTankType | 'random'
-        position: [number, number, IDirection]
-      }>
-    >
   }
   bricks: Array<IMapBrick>
   props: {
