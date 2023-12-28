@@ -24,7 +24,10 @@ const mapConfig: (props: IMapProp) => IMapInfo = (props) => {
         ['midRed', 'midSliver', 'midBrown'],
         ['bigRed', 'bigSliver', 'bigBrown'],
       ],
-      // how many count enemy
+      /**
+       * deprecated
+       * how many count enemy
+       */
       number: 3,
       // every count interval
       interval: 12000,

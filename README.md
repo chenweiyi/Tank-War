@@ -18,6 +18,9 @@ One day My son ask me whether I could make a game for him. I said yes, so I deci
 - 2023-12-09: create a config file; deal the question when multiple keys press at same times
 - 2023-12-11: add a explode prop
 - 2023-12-12: add adobe brick
+- 2023-12-16: add favicon and title
+- 2023-12-22: add a map level 1; modify collision logic;
+- 2023-12-24: add king; add map system; add event bus;
 
 ## Road Map
 
