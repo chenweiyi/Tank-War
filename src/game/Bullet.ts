@@ -73,7 +73,7 @@ export default class Bullet extends EventSync {
   }
 
   init(ctx: CanvasRenderingContext2D) {
-    this.bindEventBus()
+    // this.bindEventBus()
     this.#draw(ctx)
   }
 
@@ -185,7 +185,7 @@ export default class Bullet extends EventSync {
   }
 
   destroy() {
-    this.unbindEventBus()
+    // this.unbindEventBus()
     this.stage!.destroy(this)
   }
 }

@@ -65,7 +65,7 @@ export default class Tank extends EventSync {
   }
 
   init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
-    this.bindEventBus()
+    // this.bindEventBus()
   }
 
   addStage(stage: InstanceType<typeof Stage>) {
@@ -355,7 +355,7 @@ export default class Tank extends EventSync {
 
   destroy() {
     this.unbindEvents()
-    this.unbindEventBus()
+    // this.unbindEventBus()
     this.stage!.destroy(this)
   }
 }

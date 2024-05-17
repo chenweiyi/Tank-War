@@ -29,6 +29,8 @@ export default class Stage {
   currentLevelMapInfo: IMapInfo | undefined
   #initExplodePropsTimer: NodeJS.Timeout | undefined
   #explodePropsNumber: number = 0
+  #gamestart = false
+  #gameover = false
 
   constructor(
     graghics: HTMLImageElement,
@@ -55,6 +57,20 @@ export default class Stage {
   }
 
   render() {
+    if (
+      this.#gamestart &&
+      !this.#gameover &&
+      (!this.elements.find((e) => e.type === 'king') ||
+        !this.elements.find((e) => e.type === 'player1' || 'player2'))
+    ) {
+      console.log('===== game over!!! ======')
+
+      window.$eventBus.emit({
+        eventName: 'gameover',
+      })
+
+      this.#gameover = true
+    }
     this.clear()
     this.elements.forEach((elements) => {
       elements.draw(this.ctx, this.graghics)
@@ -200,6 +216,7 @@ export default class Stage {
     this.#renderEnemy()
     this.#renderProp()
     this.#renderKing()
+    this.#gamestart = true
   }
 
   #renderKing() {

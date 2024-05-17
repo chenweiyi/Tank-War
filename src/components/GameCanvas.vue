@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ElMessageBox } from 'element-plus'
 
-import EventBus from '../EventBus'
+import EventBus from '../helper/EventBus'
 import graghics from '../assets/images/graphics.png'
 // import Enemy from '../game/Enemy'
 // import Player1 from '../game/Player1'
@@ -43,6 +43,7 @@ onMounted(() => {
   window.$eventBus.on({
     eventName: 'gameover',
     func: () => {
+      console.log('gameover func execute...')
       ElMessageBox.confirm('哎呀，你被电脑打败了，要重新开始吗？', '~小提示~', {
         confirmButtonText: '重新开始游戏',
         cancelButtonText: '不想玩了',

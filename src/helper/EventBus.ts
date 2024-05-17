@@ -38,16 +38,13 @@ export default class EventBus {
 
   on({ eventName, func, target, once = false }: IEventOnEvent) {
     let event = this.events.find((e) => e.name === eventName)
-    if (!event) {
-      event = { name: eventName, cbs: new Set(), target, once }
-    }
     if (target) {
       event = this.events.find((e) => e.name === eventName && e.target === target)
     }
     if (!event) {
       event = { name: eventName, cbs: new Set(), target, once }
-      this.events.push(event)
     }
+    this.events.push(event)
     event.cbs.add(func)
   }
 

@@ -99,7 +99,7 @@ export default class Enemy extends Tank {
   }
 
   init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
-    this.bindEventBus()
+    // this.bindEventBus()
     this.#moveByDirection()
     this.#autoShot()
     this.#randomMove()
@@ -210,7 +210,7 @@ export default class Enemy extends Tank {
   unbindEvents(): void {}
 
   destroy() {
-    this.unbindEventBus()
+    // this.unbindEventBus()
     this.#rqAF !== undefined && cancelAnimationFrame(this.#rqAF)
     this.#timer !== undefined && clearTimeout(this.#timer)
     this.#shotTimer !== undefined && clearInterval(this.#shotTimer)

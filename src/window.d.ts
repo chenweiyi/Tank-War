@@ -1,4 +1,4 @@
-import EventBus from './EventBus'
+import EventBus from './helper/EventBusventBus'
 
 declare global {
   interface Window {
