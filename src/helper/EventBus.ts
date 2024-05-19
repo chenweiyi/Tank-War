@@ -44,8 +44,8 @@ export default class EventBus {
     if (!event) {
       event = { name: eventName, cbs: new Set(), target, once }
     }
-    this.events.push(event)
     event.cbs.add(func)
+    this.events.push(event)
   }
 
   emit(params: IEventEmitEvent) {
@@ -66,7 +66,7 @@ export default class EventBus {
     } finally {
       events.forEach((event) => {
         if (event.once) {
-          this.off({ eventName })
+          this.off({ eventName, target })
         }
       })
     }

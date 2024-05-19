@@ -21,23 +21,46 @@ export class CountDown {
   bindEvent() {
     this.eventBus.on({
       eventName: 'pause',
-      func: () => {
-        if (this.st === undefined || this.remainSt === undefined || this.remainSt <= 0) return
-        const now = Date.now()
-        if (now - this.st < this.remainSt) {
-          this.remainSt = this.remainSt - (now - this.st)
-          this.timer && clearTimeout(this.timer)
-        }
-      },
+      func: this.#pause,
     })
 
     this.eventBus.on({
       eventName: 'resume',
-      func: () => {
-        if (this.remainSt === undefined || this.remainSt <= 0) return
-        this.#start(this.remainSt)
-      },
+      func: this.#resume,
     })
+  }
+
+  unBindEvent() {
+    this.eventBus.off({
+      eventName: 'pause',
+      func: this.#pause,
+    })
+
+    this.eventBus.off({
+      eventName: 'resume',
+      func: this.#resume,
+    })
+  }
+
+  #pause() {
+    if (this.st === undefined) return
+    if (this.remainSt === undefined || this.remainSt <= 0) {
+      this.unBindEvent()
+      return
+    }
+    const now = Date.now()
+    if (now - this.st < this.remainSt) {
+      this.remainSt = this.remainSt - (now - this.st)
+      this.timer && clearTimeout(this.timer)
+    }
+  }
+
+  #resume() {
+    if (this.remainSt === undefined || this.remainSt <= 0) {
+      this.unBindEvent()
+      return
+    }
+    this.#start(this.remainSt)
   }
 
   start() {
