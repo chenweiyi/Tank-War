@@ -1,44 +1,51 @@
 import EventBus from './EventBus'
 
-export class CountDown {
+export default class CountDown {
   time: number
   callback: () => void
   eventBus: EventBus
   timer: NodeJS.Timeout | undefined
   st: number | undefined
   remainSt: number | undefined
+  cycle: boolean
 
-  constructor(time: number, callback: () => void, eventBus: EventBus) {
+  #pauseThis
+  #resumeThis
+
+  constructor(time: number, callback: () => void, eventBus: EventBus, cycle: boolean = false) {
     this.timer = undefined
     this.st = undefined
     this.time = time
     this.remainSt = time
     this.callback = callback
     this.eventBus = eventBus
+    this.cycle = cycle
+    this.#pauseThis = this.#pause.bind(this)
+    this.#resumeThis = this.#resume.bind(this)
     this.bindEvent()
   }
 
   bindEvent() {
     this.eventBus.on({
       eventName: 'pause',
-      func: this.#pause,
+      func: this.#pauseThis,
     })
 
     this.eventBus.on({
       eventName: 'resume',
-      func: this.#resume,
+      func: this.#resumeThis,
     })
   }
 
   unBindEvent() {
     this.eventBus.off({
       eventName: 'pause',
-      func: this.#pause,
+      func: this.#pauseThis,
     })
 
     this.eventBus.off({
       eventName: 'resume',
-      func: this.#resume,
+      func: this.#resumeThis,
     })
   }
 
@@ -58,6 +65,9 @@ export class CountDown {
   #resume() {
     if (this.remainSt === undefined || this.remainSt <= 0) {
       this.unBindEvent()
+      if (this.cycle) {
+        this.#start(this.time)
+      }
       return
     }
     this.#start(this.remainSt)
@@ -70,7 +80,33 @@ export class CountDown {
   #start(time: number) {
     this.st = Date.now()
     this.timer = setTimeout(() => {
-      this.callback()
+      try {
+        this.callback()
+      } catch (error) {
+        console.error(error)
+      } finally {
+        if (this.cycle) {
+          this.#start(this.time)
+        } else {
+          this.unBindEvent()
+        }
+      }
     }, time)
+  }
+
+  static gen({
+    time,
+    eventBus,
+    callback,
+    cycle = false,
+  }: {
+    time: number
+    eventBus: EventBus
+    callback: () => void
+    cycle?: boolean
+  }) {
+    const countDown = new CountDown(time, callback, eventBus, cycle)
+    countDown.start()
+    return countDown
   }
 }

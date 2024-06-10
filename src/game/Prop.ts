@@ -12,7 +12,6 @@ export default class Prop extends EventSync {
   stage: InstanceType<typeof Stage> | undefined
   property: IPropProperty | undefined
   duration: number = Infinity
-  #timer: NodeJS.Timeout | undefined
   _destroy = false
 
   constructor(x: number, y: number, duration?: number) {
@@ -26,9 +25,7 @@ export default class Prop extends EventSync {
     this.#destroyWhenTimeCome()
   }
 
-  pauseEventCallback() {
-    clearTimeout(this.#timer)
-  }
+  pauseEventCallback() {}
 
   resumeEventCallback() {
     this.#destroyWhenTimeCome()
@@ -36,10 +33,14 @@ export default class Prop extends EventSync {
 
   #destroyWhenTimeCome() {
     if (this.duration < Infinity) {
-      this.#timer = setTimeout(() => {
-        if (this._destroy) return
-        this.destroy()
-      }, this.duration)
+      window.$CountDownGen({
+        time: this.duration,
+        eventBus: window.$eventBus,
+        callback: () => {
+          if (this._destroy) return
+          this.destroy()
+        },
+      })
     }
   }
 
@@ -76,7 +77,6 @@ export default class Prop extends EventSync {
   }
 
   destroy() {
-    clearTimeout(this.#timer)
     this.stage!.destroy(this)
   }
 }

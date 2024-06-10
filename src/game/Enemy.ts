@@ -68,10 +68,8 @@ export default class Enemy extends Tank {
   directionProperty: ITankDirectionProperty | undefined
   direction: IDirection
   #rqAF: number | undefined
-  #timer: number | undefined
   #collisionInterval: number = ENEMY_COLLISION_INTERVAL
   #stopMove: boolean = false
-  #shotTimer: NodeJS.Timeout | undefined = undefined
 
   constructor({
     enemyType,
@@ -99,7 +97,6 @@ export default class Enemy extends Tank {
   }
 
   init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
-    // this.bindEventBus()
     this.#moveByDirection()
     this.#autoShot()
     this.#randomMove()
@@ -112,33 +109,34 @@ export default class Enemy extends Tank {
     this.#randomMove()
   }
 
-  #wait(time: number) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(1)
-      }, time)
+  async #randomMove() {
+    window.$CountDownGen({
+      time: randomNumber(
+        ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD[0],
+        ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD[1],
+      ),
+      callback: () => {
+        if (this._destroy) return
+        if (this._pause) return
+        this.#thinkNext()
+        this.#randomMove()
+      },
+      eventBus: window.$eventBus,
     })
   }
 
-  async #randomMove() {
-    await this.#wait(
-      randomNumber(ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD[0], ENEMY_RANDOM_MOVE_WAIT_TIME_PERIOD[1]),
-    )
-    if (this._destroy) return
-    if (this._pause) return
-    this.#thinkNext()
-    this.#randomMove()
-  }
-
   async #autoShot() {
-    await this.#wait(
-      randomNumber(ENEMY_AUTO_SHOT_WAIT_TIME_PERIOD[0], ENEMY_AUTO_SHOT_WAIT_TIME_PERIOD[1]),
-    )
-    if (this._destroy) return
-    if (this._pause) return
-    const bullet = new Bullet(this.bulletColor, ENEMY_BULLET_SPEED, this)
-    this.stage!.add(bullet)
-    this.#autoShot()
+    window.$CountDownGen({
+      time: randomNumber(ENEMY_AUTO_SHOT_WAIT_TIME_PERIOD[0], ENEMY_AUTO_SHOT_WAIT_TIME_PERIOD[1]),
+      callback: () => {
+        if (this._destroy) return
+        if (this._pause) return
+        const bullet = new Bullet(this.bulletColor, ENEMY_BULLET_SPEED, this)
+        this.stage!.add(bullet)
+        this.#autoShot()
+      },
+      eventBus: window.$eventBus,
+    })
   }
 
   #moveByDirection() {
@@ -194,15 +192,15 @@ export default class Enemy extends Tank {
       cancelAnimationFrame(this.#rqAF)
       this.#rqAF = undefined
     }
-    if (this.#timer !== undefined) {
-      clearTimeout(this.#timer)
-    }
-    // @ts-ignore
-    this.#timer = setTimeout(() => {
-      this.#stopMove = false
-      this.direction = getHumanizedRandomDirection(this.direction)
-      this.#moveByDirection()
-    }, this.#collisionInterval)
+    window.$CountDownGen({
+      time: this.#collisionInterval,
+      callback: () => {
+        this.#stopMove = false
+        this.direction = getHumanizedRandomDirection(this.direction)
+        this.#moveByDirection()
+      },
+      eventBus: window.$eventBus,
+    })
   }
 
   bindEvents(): void {}
@@ -210,10 +208,7 @@ export default class Enemy extends Tank {
   unbindEvents(): void {}
 
   destroy() {
-    // this.unbindEventBus()
     this.#rqAF !== undefined && cancelAnimationFrame(this.#rqAF)
-    this.#timer !== undefined && clearTimeout(this.#timer)
-    this.#shotTimer !== undefined && clearInterval(this.#shotTimer)
     this.stage!.destroy(this)
   }
 }

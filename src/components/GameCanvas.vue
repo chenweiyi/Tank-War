@@ -2,6 +2,7 @@
 import { ElMessageBox } from 'element-plus'
 
 import EventBus from '../helper/EventBus'
+import CountDown from '../helper/CountDown'
 import graghics from '../assets/images/graphics.png'
 // import Enemy from '../game/Enemy'
 // import Player1 from '../game/Player1'
@@ -32,6 +33,7 @@ const toggleGame = () => {
 
 onMounted(() => {
   window.$eventBus = new EventBus()
+  window.$CountDownGen = CountDown.gen
   const img = new Image()
   img.src = graghics
   img.onload = () => {
