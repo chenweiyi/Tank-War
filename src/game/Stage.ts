@@ -60,7 +60,7 @@ export default class Stage {
       this.#gamestart &&
       !this.#gameover &&
       (!this.elements.find((e) => e.type === 'king') ||
-        !this.elements.some((e) => e.type === 'player1' || 'player2'))
+        !this.elements.some((e) => ['player1', 'player2'].includes(e.type)))
     ) {
       console.log('===== game over!!! ======')
 
@@ -69,12 +69,13 @@ export default class Stage {
       })
 
       this.#gameover = true
+    } else {
+      this.clear()
+      this.elements.forEach((elements) => {
+        elements.draw(this.ctx, this.graghics)
+      })
+      requestAnimationFrame(this.render.bind(this))
     }
-    this.clear()
-    this.elements.forEach((elements) => {
-      elements.draw(this.ctx, this.graghics)
-    })
-    requestAnimationFrame(this.render.bind(this))
   }
 
   #initExplodeProps(config: IMapInfo['props']['explodeProp']) {
