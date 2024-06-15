@@ -321,5 +321,7 @@ export default class Stage {
     })
   }
 
-  restart() {}
+  restart() {
+    window.location.reload()
+  }
 }

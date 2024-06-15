@@ -1,12 +1,10 @@
 <script setup lang="ts">
+import 'element-plus/es/components/message-box/style/css'
 import { ElMessageBox } from 'element-plus'
 
 import EventBus from '../helper/EventBus'
 import CountDown from '../helper/CountDown'
 import graghics from '../assets/images/graphics.png'
-// import Enemy from '../game/Enemy'
-// import Player1 from '../game/Player1'
-// import Player2 from '../game/Player2'
 import Stage from '../game/Stage.ts'
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../game/config'
 
@@ -14,7 +12,7 @@ let stage: Stage
 const canvasRef = ref()
 const w = ref(CANVAS_WIDTH)
 const h = ref(CANVAS_HEIGHT)
-const isPause = ref(false)
+const status = ref<'start' | 'pause' | 'restart'>()
 
 const closeWindow = () => {
   window.opener = null
@@ -22,13 +20,19 @@ const closeWindow = () => {
   window.close()
 }
 
-const toggleGame = () => {
-  isPause.value = !isPause.value
-  if (isPause.value) {
-    stage.pause()
-  } else {
-    stage.resume()
-  }
+const startGame = () => {
+  status.value = 'start'
+  stage.start()
+}
+
+const pauseGame = () => {
+  status.value = 'pause'
+  stage.pause()
+}
+
+const restartGame = () => {
+  status.value = 'restart'
+  stage.resume()
 }
 
 onMounted(() => {
@@ -41,7 +45,6 @@ onMounted(() => {
     const canvas = canvasRef.value as HTMLCanvasElement
     const ctx = canvas!.getContext('2d')
     stage = new Stage(img, ctx!, w.value, h.value)
-    stage.start()
   }
   window.$eventBus.on({
     eventName: 'gameover',
@@ -66,8 +69,9 @@ onMounted(() => {
 
 <template>
   <div absolute top-16px left-0 right-0 m-auto flex justify-center items-center h-60px>
-    <el-button v-if="!isPause" type="primary" @click="toggleGame">暂停游戏</el-button>
-    <el-button v-else type="primary" @click="toggleGame">恢复游戏</el-button>
+    <el-button v-if="!status" type="primary" @click="startGame">开始游戏</el-button>
+    <el-button v-if="status === 'start'" type="primary" @click="pauseGame">暂停游戏</el-button>
+    <el-button v-if="status === 'pause'" type="primary" @click="restartGame">恢复游戏</el-button>
   </div>
   <div w-full h-full flex justify-center items-center>
     <canvas ref="canvasRef" width="800" height="600" class="bg-black"></canvas>
