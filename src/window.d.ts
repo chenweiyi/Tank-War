@@ -5,5 +5,6 @@ declare global {
   interface Window {
     $eventBus: EventBus
     $CountDownGen: CountDown.gen
+    $CountDownGen2: CountDown.gen2
   }
 }

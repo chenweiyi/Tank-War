@@ -22,24 +22,20 @@ export default class Prop extends EventSync {
   }
 
   init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
-    this.#destroyWhenTimeCome()
+    this.destroyWhenTimeCome()
   }
 
   pauseEventCallback() {}
 
   resumeEventCallback() {
-    this.#destroyWhenTimeCome()
+    this.destroyWhenTimeCome()
   }
 
-  #destroyWhenTimeCome() {
+  destroyWhenTimeCome() {
     if (this.duration < Infinity) {
-      window.$CountDownGen({
-        time: this.duration,
-        eventBus: window.$eventBus,
-        callback: () => {
-          if (this._destroy) return
-          this.destroy()
-        },
+      window.$CountDownGen2(this.duration).then(() => {
+        if (this._destroy) return
+        this.destroy()
       })
     }
   }

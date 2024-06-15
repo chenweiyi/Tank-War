@@ -60,6 +60,7 @@ export default class Bullet extends EventSync {
   stage: InstanceType<typeof Stage> | undefined
   source: InstanceType<typeof Tank>
   _destroy = false
+  _pause = false
 
   constructor(color: string, speed: number, source: InstanceType<typeof Tank>) {
     super()
@@ -73,7 +74,7 @@ export default class Bullet extends EventSync {
   }
 
   init(ctx: CanvasRenderingContext2D) {
-    // this.bindEventBus()
+    this.bindEventBus()
     this.#draw(ctx)
   }
 

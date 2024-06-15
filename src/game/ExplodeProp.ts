@@ -8,6 +8,10 @@ export default class ExplodeProp extends Prop {
     super(x, y, duration)
   }
 
+  init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
+    this.destroyWhenTimeCome()
+  }
+
   draw(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {
     ctx.drawImage(
       graghics,

@@ -34,6 +34,7 @@ const toggleGame = () => {
 onMounted(() => {
   window.$eventBus = new EventBus()
   window.$CountDownGen = CountDown.gen
+  window.$CountDownGen2 = CountDown.gen2
   const img = new Image()
   img.src = graghics
   img.onload = () => {

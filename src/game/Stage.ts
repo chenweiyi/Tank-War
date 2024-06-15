@@ -78,21 +78,17 @@ export default class Stage {
   }
 
   #initExplodeProps(config: IMapInfo['props']['explodeProp']) {
-    window.$CountDownGen({
-      time: config.interval,
-      callback: () => {
-        let position = config.position
-        if (position === 'random') {
-          position = [randomBetween(50, this.w - 50), randomBetween(50, this.h - 50)]
-        }
-        const explodeProp = new ExplodeProp(position[0], position[1], config.duration)
-        this.add(explodeProp)
-        this.#explodePropsNumber++
-        if (this.#explodePropsNumber <= config.max) {
-          this.#initExplodeProps(config)
-        }
-      },
-      eventBus: window.$eventBus,
+    window.$CountDownGen2(config.interval).then(() => {
+      let position = config.position
+      if (position === 'random') {
+        position = [randomBetween(50, this.w - 50), randomBetween(50, this.h - 50)]
+      }
+      const explodeProp = new ExplodeProp(position[0], position[1], config.duration)
+      this.add(explodeProp)
+      this.#explodePropsNumber++
+      if (this.#explodePropsNumber <= config.max) {
+        this.#initExplodeProps(config)
+      }
     })
   }
 
@@ -255,15 +251,7 @@ export default class Stage {
 
   async #renderEnemy() {
     function countDownTask(time: number) {
-      return new Promise((resolve) => {
-        window.$CountDownGen({
-          time,
-          eventBus: window.$eventBus,
-          callback: () => {
-            resolve(true)
-          },
-        })
-      })
+      return window.$CountDownGen2(time)
     }
 
     if (this.currentLevelMapInfo) {
@@ -281,6 +269,7 @@ export default class Stage {
           })
           this.add(enemy)
         })
+        console.log('for cicle')
         await countDownTask(enemyOption.interval)
       }
     }

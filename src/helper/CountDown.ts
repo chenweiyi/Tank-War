@@ -8,16 +8,25 @@ export default class CountDown {
   st: number | undefined
   remainSt: number | undefined
   cycle: boolean
+  p: Promise<any>
+  resolve: (v: any) => void
 
   #pauseThis
   #resumeThis
 
   constructor(time: number, callback: () => void, eventBus: EventBus, cycle: boolean = false) {
+    this.resolve = () => {}
+    this.p = new Promise((res) => {
+      this.resolve = res
+    })
     this.timer = undefined
     this.st = undefined
     this.time = time
     this.remainSt = time
-    this.callback = callback
+    this.callback = () => {
+      callback()
+      this.resolve(1)
+    }
     this.eventBus = eventBus
     this.cycle = cycle
     this.#pauseThis = this.#pause.bind(this)
@@ -107,6 +116,12 @@ export default class CountDown {
   }) {
     const countDown = new CountDown(time, callback, eventBus, cycle)
     countDown.start()
-    return countDown
+    return countDown.p
+  }
+
+  static gen2(time: number, cycle = false) {
+    const countDown = new CountDown(time, () => {}, window.$eventBus, cycle)
+    countDown.start()
+    return countDown.p
   }
 }
