@@ -16,9 +16,9 @@ export default class Brick {
     this.y = y
   }
 
-  init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {}
+  init(_ctx: CanvasRenderingContext2D, _graghics: HTMLImageElement) {}
 
-  draw(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {}
+  draw(_ctx: CanvasRenderingContext2D, _graghics: HTMLImageElement) {}
 
   addStage(stage: InstanceType<typeof Stage>) {
     this.stage = stage
@@ -48,7 +48,7 @@ export default class Brick {
    * Being collision by someone else
    * @param { INode } node - collision node
    */
-  gotCollision(node: INode) {}
+  gotCollision(_node: INode) {}
 
   destroy() {
     this.stage!.destroy(this)
