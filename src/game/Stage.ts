@@ -30,6 +30,7 @@ export default class Stage {
   #explodePropsNumber: number = 0
   #gamestart = false
   #gameover = false
+  #levelCleared = false
 
   constructor(
     graghics: HTMLImageElement,
@@ -69,11 +70,16 @@ export default class Stage {
       })
 
       this.#gameover = true
+    } else if (this.#gamestart && !this.#gameover && this.#levelCleared) {
+      // 关卡胜利，进入下一关
+      console.log(`===== Level ${this.currentLevel + 1} Cleared! ======`)
+      this.nextLevel()
     } else {
       this.clear()
       this.elements.forEach((elements) => {
         elements.draw(this.ctx, this.graghics)
       })
+      this.#checkLevelClear()
       requestAnimationFrame(this.render.bind(this))
     }
   }
@@ -320,6 +326,40 @@ export default class Stage {
     window.$eventBus.emit({
       eventName: 'resume',
     })
+  }
+
+  #checkLevelClear() {
+    // 检测是否所有敌人都被消灭
+    const hasEnemy = this.elements.some((e) => isEnemy(e) && !e._destroy)
+    if (!hasEnemy && this.currentLevel < this.totalLevel - 1) {
+      this.#levelCleared = true
+    }
+  }
+
+  nextLevel() {
+    if (this.currentLevel < this.totalLevel - 1) {
+      // 进入下一关
+      this.currentLevel++
+      this.#levelCleared = false
+      this.#gamestart = false
+      this.#gameover = false
+      
+      // 清空当前关卡元素
+      this.elements = []
+      
+      // 重新开始下一关
+      this.#start()
+      
+      console.log(`===== Starting Level ${this.currentLevel + 1} ======`)
+    } else {
+      // 通关游戏
+      console.log('===== Congratulations! You passed all levels! ======')
+      window.$eventBus.emit({
+        eventName: 'gameover',
+        victory: true,
+      })
+      this.#gameover = true
+    }
   }
 
   restart() {
