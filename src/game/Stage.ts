@@ -62,7 +62,8 @@ export default class Stage {
     if (
       this.#gamestart &&
       !this.#gameover &&
-      !this.elements.find((e) => ['player1', 'player2', 'king'].includes(e.type))
+      (!this.elements.find((e) => 'king' === e.type) ||
+        !this.elements.find((e) => e.type.includes('player')))
     ) {
       console.log('===== game over!!! ======')
 
