@@ -99,7 +99,6 @@ export default class Tank extends EventSync {
   gotCollision(node: INode) {
     if (node.type === 'bullet') {
       if (node.source !== this && !isSameType(this, node.source!)) {
-        console.log('1', this.type, node.source!.type)
         this.destroy()
       } else if (
         node.source !== this &&
@@ -108,7 +107,6 @@ export default class Tank extends EventSync {
         // @ts-ignore
         ENEMY_KILL_EACH_OTHER === true
       ) {
-        console.log('2', this.type, node.source!.type)
         this.destroy()
       } else if (
         node.source !== this &&
@@ -117,7 +115,6 @@ export default class Tank extends EventSync {
         // @ts-ignore
         PLAYER_KILL_EACH_OTHER === true
       ) {
-        console.log('3', this.type, node.source!.type)
         this.destroy()
       }
     }
@@ -242,34 +239,31 @@ export default class Tank extends EventSync {
   }
 
   keydownMoveHandler(e: KeyboardEvent) {
-    console.log('e: ', e.key)
-    if (!this._pause) {
+    if (!this._pause && !this._destroy) {
       this.keydownList.add(e.key)
     }
   }
 
   keydownShotHandler(e: KeyboardEvent) {
-    console.log('e: ', e.key)
-    if (!this._pause) {
+    if (!this._pause && !this._destroy) {
       this.keydownList.add(e.key)
     }
   }
 
   keyupMoveHandler(e: KeyboardEvent) {
-    console.log('e: ', e.key)
-    if (!this._pause) {
+    if (!this._pause && !this._destroy) {
       this.keydownList.delete(e.key)
     }
   }
 
   keyupShotHandler(e: KeyboardEvent) {
-    console.log('e: ', e.key)
-    if (!this._pause) {
+    if (!this._pause && !this._destroy) {
       this.keydownList.delete(e.key)
     }
   }
 
   moveHandler(key: string) {
+    if (this._destroy || this._pause) return
     switch (key) {
       case this.keybindMoveConfig!['up']:
         this.moveUp()
@@ -296,6 +290,7 @@ export default class Tank extends EventSync {
   }
 
   shotHandler(key: string) {
+    if (this._destroy || this._pause) return
     switch (key) {
       case this.keybindMoveConfig!['shot']: {
         const bullet = new Bullet(this.bulletColor, 6, this)

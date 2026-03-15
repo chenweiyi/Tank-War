@@ -30,6 +30,9 @@ export default class Stage {
   #explodePropsNumber: number = 0
   #gamestart = false
   #gameover = false
+  #levelCleared = false
+  #enemySpawnDone = false
+  #enemySpawnAbort = false
 
   constructor(
     graghics: HTMLImageElement,
@@ -59,21 +62,30 @@ export default class Stage {
     if (
       this.#gamestart &&
       !this.#gameover &&
-      (!this.elements.find((e) => e.type === 'king') ||
-        !this.elements.some((e) => ['player1', 'player2'].includes(e.type)))
+      !this.elements.find((e) => ['player1', 'player2', 'king'].includes(e.type))
     ) {
       console.log('===== game over!!! ======')
+
+      this.#enemySpawnAbort = true
+      this.destroyEnemy()
+      this.destroyEnemyBullet()
 
       window.$eventBus.emit({
         eventName: 'gameover',
       })
 
       this.#gameover = true
+    } else if (this.#gamestart && !this.#gameover && this.#levelCleared) {
+      // 关卡胜利，进入下一关
+      console.log(`===== Level ${this.currentLevel + 1} Cleared! ======`)
+      this.nextLevel()
+      requestAnimationFrame(this.render.bind(this))
     } else {
       this.clear()
       this.elements.forEach((elements) => {
         elements.draw(this.ctx, this.graghics)
       })
+      this.#checkLevelClear()
       requestAnimationFrame(this.render.bind(this))
     }
   }
@@ -255,9 +267,13 @@ export default class Stage {
       return window.$CountDownGen2(time)
     }
 
+    this.#enemySpawnDone = false
+    this.#enemySpawnAbort = false
+
     if (this.currentLevelMapInfo) {
       const enemyOption = this.currentLevelMapInfo.enemy
       for (let i = 0; i < enemyOption.type.length; i++) {
+        if (this.#enemySpawnAbort) break
         const item = enemyOption.type[i]
         const positions = this.#genPositions(item.length)
         item.forEach((e, i) => {
@@ -270,10 +286,11 @@ export default class Stage {
           })
           this.add(enemy)
         })
-        console.log('for cicle')
         await countDownTask(enemyOption.interval)
       }
     }
+
+    this.#enemySpawnDone = true
   }
 
   #renderProp() {
@@ -295,6 +312,7 @@ export default class Stage {
   }
 
   destroyEnemy() {
+    this.#enemySpawnAbort = true
     this.elements
       .filter((element) => isEnemy(element))
       .forEach((element) => {
@@ -320,6 +338,44 @@ export default class Stage {
     window.$eventBus.emit({
       eventName: 'resume',
     })
+  }
+
+  #checkLevelClear() {
+    // 只有在所有波次都生成完毕后才判断通关
+    if (!this.#enemySpawnDone) return
+    const hasEnemy = this.elements.filter((e) => isEnemy(e)).length > 0
+    if (!hasEnemy) {
+      this.#levelCleared = true
+    }
+  }
+
+  nextLevel() {
+    if (this.currentLevel < this.totalLevel - 1) {
+      // 进入下一关
+      this.currentLevel++
+      this.#levelCleared = false
+      this.#gamestart = false
+      this.#gameover = false
+      this.#enemySpawnDone = false
+      this.#enemySpawnAbort = false
+
+      // 清空当前关卡元素
+      this.elements.forEach((e) => e.destroy())
+      this.elements = []
+
+      // 重新开始下一关
+      this.#start()
+
+      console.log(`===== Starting Level ${this.currentLevel + 1} ======`)
+    } else {
+      // 通关游戏
+      console.log('===== Congratulations! You passed all levels! ======')
+      window.$eventBus.emit({
+        eventName: 'gameover',
+        victory: true,
+      })
+      this.#gameover = true
+    }
   }
 
   restart() {

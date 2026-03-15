@@ -15,8 +15,8 @@ const w = ref(CANVAS_WIDTH)
 const h = ref(CANVAS_HEIGHT)
 const status = ref<'start' | 'pause' | 'restart'>()
 
-let player1Score = ref(0)
-let player2Score = ref(0)
+const player1Score = ref(0)
+const player2Score = ref(0)
 
 const closeWindow = () => {
   window.opener = null
@@ -69,6 +69,13 @@ onMounted(() => {
   window.$CountDownGen = CountDown.gen
   window.$CountDownGen2 = CountDown.gen2
   window.$eventBus.on({
+    eventName: 'kill',
+    func: ({ killer }: { killer: string }) => {
+      if (killer === 'player1') player1Score.value++
+      else if (killer === 'player2') player2Score.value++
+    },
+  })
+  window.$eventBus.on({
     eventName: 'gameover',
     func: () => {
       console.log('gameover func execute...')
@@ -79,6 +86,8 @@ onMounted(() => {
         center: true,
       })
         .then(() => {
+          player1Score.value = 0
+          player2Score.value = 0
           stage.restart()
         })
         .catch(() => {
@@ -96,7 +105,7 @@ onMounted(() => {
   </div>
   <div w-full h-full flex justify-center items-center v-if="status">
     <canvas ref="canvasRef" width="800" height="600" class="bg-black mr-10px"></canvas>
-    <div class="flex-1 grid grid-cols-[1fr_3fr] grid-rows-[60px_60px]">
+    <div class="flex-1 grid grid-cols-[1fr_1fr] grid-rows-[60px_60px]">
       <span class="font-semibold">玩家类别</span><span class="font-semibold">歼敌数量</span>
       <div class="flex">
         <span class="w-26px h-26px mr-4px" :style="player1Style"></span><span>(玩家一)</span>

@@ -101,8 +101,12 @@ export default class Enemy extends Tank {
     console.log('enemy init')
     this.bindEventBus()
     this.#moveByDirection()
-    this.#autoShot()
-    this.#randomMove()
+    if (!this._destroy && !this._pause) {
+      this.#autoShot()
+    }
+    if (!this._destroy && !this._pause) {
+      this.#randomMove()
+    }
   }
   pauseEventCallback() {}
   resumeEventCallback() {}
@@ -116,7 +120,9 @@ export default class Enemy extends Tank {
         if (this._destroy) return
         if (this._pause) return
         this.#thinkNext().then(() => {
-          this.#randomMove()
+          if (!this._destroy && !this._pause) {
+            this.#randomMove()
+          }
         })
       })
   }
@@ -132,7 +138,9 @@ export default class Enemy extends Tank {
         console.log('new bullet')
         const bullet = new Bullet(this.bulletColor, ENEMY_BULLET_SPEED, this)
         this.stage!.add(bullet)
-        this.#autoShot()
+        if (!this._destroy && !this._pause) {
+          this.#autoShot()
+        }
       })
   }
 
@@ -161,11 +169,17 @@ export default class Enemy extends Tank {
     this.#rqAF = requestAnimationFrame(move)
   }
 
+  gotCollision(node: INode) {
+    if (node.type === 'bullet' && node.source && !isSameType(this, node.source)) {
+      window.$eventBus.emit({ eventName: 'kill', killer: node.source.type })
+    }
+    super.gotCollision(node)
+  }
+
   collisionOther(node: INode) {
     if (isBrick(node) || isTank(node) || isKing(node)) {
       this.#thinkNext()
     } else if (isBullet(node) && node.source !== this && !isSameType(node.source!, this)) {
-      console.log('11', node.source?.type, this.type)
       this.destroy()
     } else if (
       isBullet(node) &&
@@ -174,7 +188,6 @@ export default class Enemy extends Tank {
       // @ts-ignore
       ENEMY_KILL_EACH_OTHER === true
     ) {
-      console.log('22', node.source?.type, this.type)
       this.destroy()
     }
   }
@@ -198,7 +211,10 @@ export default class Enemy extends Tank {
   unbindEvents(): void {}
 
   destroy() {
+    this._destroy = true
+    this._pause = true
     this.#rqAF !== undefined && cancelAnimationFrame(this.#rqAF)
+    this.unbindEventBus()
     this.stage!.destroy(this)
   }
 }

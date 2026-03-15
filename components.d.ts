@@ -7,7 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    Canvas: typeof import('./src/components/Canvas.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     GameCanvas: typeof import('./src/components/GameCanvas.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

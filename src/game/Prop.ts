@@ -73,6 +73,7 @@ export default class Prop extends EventSync {
   }
 
   destroy() {
+    this._destroy = true
     this.stage!.destroy(this)
   }
 }
