@@ -33,8 +33,9 @@ export default class ExplodeProp extends Prop {
   gotCollision(node: INode) {
     if (isPlayer(node)) {
       this.destroy()
-      this.stage?.destroyEnemyBullet()
+      // 先销毁敌人（停止所有异步操作），再销毁子弹（包括可能新生成的）
       this.stage?.destroyEnemy()
+      this.stage?.destroyEnemyBullet()
     }
   }
 }

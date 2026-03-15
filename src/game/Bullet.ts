@@ -186,7 +186,8 @@ export default class Bullet extends EventSync {
   }
 
   destroy() {
-    // this.unbindEventBus()
+    this._destroy = true
+    this.unbindEventBus()
     this.stage!.destroy(this)
   }
 }

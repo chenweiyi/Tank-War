@@ -1,6 +1,7 @@
 import { INode } from '../game'
 import Stage from './Stage'
 import { KING_SCALE } from './config'
+import { isEnemy } from './utils'
 
 export default class King {
   type: 'king' = 'king'
@@ -11,9 +12,9 @@ export default class King {
   scale: number = KING_SCALE
   w: number = 32
   h: number = 32
-  constructor(w: number, h: number) {
-    this.x = w / 2 - (this.w * this.scale) / 2
-    this.y = h - this.h
+  constructor(canvasWidth: number, canvasHeight: number) {
+    this.x = canvasWidth / 2 - (this.w * this.scale) / 2
+    this.y = canvasHeight - this.h
   }
 
   init(ctx: CanvasRenderingContext2D, graghics: HTMLImageElement) {}
@@ -47,7 +48,7 @@ export default class King {
    * @param { INode } node - collision node
    */
   gotCollision(node: INode) {
-    if (node.type === 'bullet') {
+    if (node.type === 'bullet' && node.source && isEnemy(node.source)) {
       this.destroy()
     }
   }

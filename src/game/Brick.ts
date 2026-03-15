@@ -51,6 +51,7 @@ export default class Brick {
   gotCollision(_node: INode) {}
 
   destroy() {
+    this._destroy = true
     this.stage!.destroy(this)
   }
 }
